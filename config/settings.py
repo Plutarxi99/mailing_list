@@ -30,7 +30,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -41,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    '',
+    'mailing',
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -74,14 +74,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
     'default': ast.literal_eval(os.getenv('DATABASE_LOGIN'))
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -101,7 +99,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -112,7 +109,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -143,11 +139,11 @@ SERVER_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
 
 # Для авторизации обязательный параметр
-AUTH_USER_MODEL = 'users.User'
-# Редирект на домашнюю страницу
-LOGOUT_REDIRECT_URL = '/'
-LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/users/'
+# AUTH_USER_MODEL = 'users.User'
+# # Редирект на домашнюю страницу
+# LOGOUT_REDIRECT_URL = '/'
+# LOGIN_REDIRECT_URL = '/'
+# LOGIN_URL = '/users/'
 
 NULLABLE = ast.literal_eval(os.getenv('NULLABLE'))
 
@@ -158,3 +154,8 @@ CACHES = {
         "LOCATION": os.getenv('CACHE_LOCATION'),
     }
 }
+
+CRONTIME=os.getenv('CRONTIME')
+CRONJOBS = [
+    (CRONTIME, 'mailing.cron.my_scheduled_job')
+]
