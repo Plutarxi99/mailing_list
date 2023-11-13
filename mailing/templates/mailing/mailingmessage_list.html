@@ -1,0 +1,44 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+<div class="footer">
+    <a type="button" class="btn btn-primary" aria-current="page" href="{% url 'mailing:mailing_message_create' %}">Создать сообщение</a>
+</div>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Названия сообщения</th>
+        <th scope="col">Тема сообщения</th>
+        <th scope="col">Для рассылки</th>
+        <th scope="col">Управление клиентом</th>
+    </tr>
+    </thead>
+    {% for object in object_list %}
+    <tbody>
+    <tr>
+    <tr class="№">
+        <th scope="row">{{ object.mailing_message_name }}</th>
+        <td>{{ object.mailing_message_topic }}</td>
+        <td>
+            {% for mailing in object.mailingsetting_set.all %}
+            {{ mailing.mailing_set_name }}
+            {% endfor %}
+        </td>
+        <td>
+            <div class="btn-group">
+                <a href="#" type="button"
+                   class="btn btn-sm btn-outline-secondary">View</a>
+
+                <a href="{% url 'mailing:mailing_message_update' object.pk %}" type="button"
+                   class="btn btn-sm btn-outline-secondary">Edit</a>
+
+                <a href="{% url 'mailing:mailing_message_delete' object.pk %}" type="button"
+                   class="btn btn-sm btn-outline-secondary">Delete</a>
+            </div>
+        </td>
+    </tr>
+
+    </tbody>
+    {% endfor %}
+</table>
+{% endblock %}

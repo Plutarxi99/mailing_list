@@ -1,0 +1,370 @@
+[
+  {
+    "model": "mailing.mailingmessage",
+    "pk": 1,
+    "fields": {
+      "mailing_message_name": "Рассылка для распродажи 11.11",
+      "mailing_message_topic": "Успей купить",
+      "mailing_message_body": "Успей купить уже сейчас"
+    }
+  },
+  {
+    "model": "mailing.mailingmessage",
+    "pk": 2,
+    "fields": {
+      "mailing_message_name": "Рассылка зима",
+      "mailing_message_topic": "зимний ассортимент",
+      "mailing_message_body": "зима"
+    }
+  },
+  {
+    "model": "mailing.mailingmessage",
+    "pk": 3,
+    "fields": {
+      "mailing_message_name": "test",
+      "mailing_message_topic": "test",
+      "mailing_message_body": "testtest"
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 50,
+    "fields": {
+      "mailing_log_name": null,
+      "mailing_log_last_try": "2023-11-02T12:21:36Z",
+      "mailing_log_is_status_try": false,
+      "mailing_log_response_server": "404",
+      "mailing_log_count_send_mail": 0
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 51,
+    "fields": {
+      "mailing_log_name": null,
+      "mailing_log_last_try": "2023-11-08T12:21:36Z",
+      "mailing_log_is_status_try": false,
+      "mailing_log_response_server": "404",
+      "mailing_log_count_send_mail": 0
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 52,
+    "fields": {
+      "mailing_log_name": null,
+      "mailing_log_last_try": "2023-11-10T12:21:36.718Z",
+      "mailing_log_is_status_try": false,
+      "mailing_log_response_server": "404",
+      "mailing_log_count_send_mail": 0
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 53,
+    "fields": {
+      "mailing_log_name": null,
+      "mailing_log_last_try": "2023-11-08T18:36:56Z",
+      "mailing_log_is_status_try": true,
+      "mailing_log_response_server": "200",
+      "mailing_log_count_send_mail": 0
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 54,
+    "fields": {
+      "mailing_log_name": null,
+      "mailing_log_last_try": "2023-11-10T18:36:57.558Z",
+      "mailing_log_is_status_try": true,
+      "mailing_log_response_server": "200",
+      "mailing_log_count_send_mail": 0
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 55,
+    "fields": {
+      "mailing_log_name": null,
+      "mailing_log_last_try": "2023-11-10T18:48:20.764Z",
+      "mailing_log_is_status_try": true,
+      "mailing_log_response_server": "200",
+      "mailing_log_count_send_mail": 0
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 56,
+    "fields": {
+      "mailing_log_name": null,
+      "mailing_log_last_try": "2023-11-11T12:48:13.414Z",
+      "mailing_log_is_status_try": true,
+      "mailing_log_response_server": "200",
+      "mailing_log_count_send_mail": 1
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 57,
+    "fields": {
+      "mailing_log_name": null,
+      "mailing_log_last_try": "2023-11-11T12:48:29.900Z",
+      "mailing_log_is_status_try": true,
+      "mailing_log_response_server": "200",
+      "mailing_log_count_send_mail": 1
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 58,
+    "fields": {
+      "mailing_log_name": null,
+      "mailing_log_last_try": "2023-11-11T12:52:59.336Z",
+      "mailing_log_is_status_try": true,
+      "mailing_log_response_server": "200",
+      "mailing_log_count_send_mail": 1
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 59,
+    "fields": {
+      "mailing_log_name": "test0",
+      "mailing_log_last_try": "2023-11-11T13:26:14.768Z",
+      "mailing_log_is_status_try": true,
+      "mailing_log_response_server": "200",
+      "mailing_log_count_send_mail": 0
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 60,
+    "fields": {
+      "mailing_log_name": "Распродажа 11.110",
+      "mailing_log_last_try": "2023-11-11T13:26:14.778Z",
+      "mailing_log_is_status_try": true,
+      "mailing_log_response_server": "200",
+      "mailing_log_count_send_mail": 0
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 61,
+    "fields": {
+      "mailing_log_name": "test №0",
+      "mailing_log_last_try": "2023-11-11T13:26:54.433Z",
+      "mailing_log_is_status_try": true,
+      "mailing_log_response_server": "200",
+      "mailing_log_count_send_mail": 0
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 62,
+    "fields": {
+      "mailing_log_name": "Распродажа 11.11 №0",
+      "mailing_log_last_try": "2023-11-11T13:26:54.442Z",
+      "mailing_log_is_status_try": true,
+      "mailing_log_response_server": "200",
+      "mailing_log_count_send_mail": 0
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 63,
+    "fields": {
+      "mailing_log_name": "Распродажа 11.11 №0",
+      "mailing_log_last_try": "2023-11-11T13:28:29.829Z",
+      "mailing_log_is_status_try": true,
+      "mailing_log_response_server": "200",
+      "mailing_log_count_send_mail": 0
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 64,
+    "fields": {
+      "mailing_log_name": "Распродажа 11.11 №0",
+      "mailing_log_last_try": "2023-11-11T13:31:29.661Z",
+      "mailing_log_is_status_try": true,
+      "mailing_log_response_server": "200",
+      "mailing_log_count_send_mail": 0
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 65,
+    "fields": {
+      "mailing_log_name": "Распродажа 11.11 №1",
+      "mailing_log_last_try": "2023-11-11T13:32:49.213Z",
+      "mailing_log_is_status_try": true,
+      "mailing_log_response_server": "200",
+      "mailing_log_count_send_mail": 1
+    }
+  },
+  {
+    "model": "mailing.mailinglog",
+    "pk": 66,
+    "fields": {
+      "mailing_log_name": "test №1",
+      "mailing_log_last_try": "2023-11-11T16:18:00.084Z",
+      "mailing_log_is_status_try": true,
+      "mailing_log_response_server": "Сервер отработал как надо",
+      "mailing_log_count_send_mail": 1
+    }
+  },
+  {
+    "model": "mailing.clientlist",
+    "pk": 1,
+    "fields": {
+      "client_list_name": "клиенты 11.11"
+    }
+  },
+  {
+    "model": "mailing.clientlist",
+    "pk": 2,
+    "fields": {
+      "client_list_name": "Зима распродажа"
+    }
+  },
+  {
+    "model": "mailing.clientlist",
+    "pk": 3,
+    "fields": {
+      "client_list_name": "test client list"
+    }
+  },
+  {
+    "model": "mailing.mailingsetting",
+    "pk": 1,
+    "fields": {
+      "mailing_set_name": "Распродажа 11.11",
+      "mailing_set_date": "2023-11-12T13:32:50Z",
+      "mailing_set_start_time": "2023-11-10T12:03:00Z",
+      "mailing_set_end_time": "2023-11-30T12:00:00Z",
+      "mailing_set_frequency": "day",
+      "mailing_set_is_status": "run",
+      "mailing_message_name": 1,
+      "client_list": 1,
+      "mailing_log": 65
+    }
+  },
+  {
+    "model": "mailing.mailingsetting",
+    "pk": 2,
+    "fields": {
+      "mailing_set_name": "Зима",
+      "mailing_set_date": "2023-11-01T06:00:00Z",
+      "mailing_set_start_time": "2023-11-01T12:00:00Z",
+      "mailing_set_end_time": "2023-11-30T12:00:00Z",
+      "mailing_set_frequency": "week",
+      "mailing_set_is_status": "run",
+      "mailing_message_name": 2,
+      "client_list": 2,
+      "mailing_log": 54
+    }
+  },
+  {
+    "model": "mailing.mailingsetting",
+    "pk": 3,
+    "fields": {
+      "mailing_set_name": "test",
+      "mailing_set_date": "2023-11-11T16:18:00Z",
+      "mailing_set_start_time": "2023-11-09T14:10:00Z",
+      "mailing_set_end_time": "2024-03-15T00:36:19Z",
+      "mailing_set_frequency": "month",
+      "mailing_set_is_status": "run",
+      "mailing_message_name": 3,
+      "client_list": 3,
+      "mailing_log": 66
+    }
+  },
+  {
+    "model": "mailing.client",
+    "pk": 1,
+    "fields": {
+      "email": "shievanov@bk.ru",
+      "first_name": "Егор",
+      "last_name": "Шеванов",
+      "comment": "qwer",
+      "client_list": 1
+    }
+  },
+  {
+    "model": "mailing.client",
+    "pk": 2,
+    "fields": {
+      "email": "egor.shievanov@gmail.com",
+      "first_name": "Максим",
+      "last_name": "Горшков",
+      "comment": "йцк",
+      "client_list": 1
+    }
+  },
+  {
+    "model": "mailing.client",
+    "pk": 3,
+    "fields": {
+      "email": "test@test.com",
+      "first_name": "test",
+      "last_name": "test",
+      "comment": "йцук",
+      "client_list": 1
+    }
+  },
+  {
+    "model": "mailing.client",
+    "pk": 4,
+    "fields": {
+      "email": "shievanov.egor@yandex.ru",
+      "first_name": "Илья",
+      "last_name": "Захаров",
+      "comment": "йцук",
+      "client_list": 1
+    }
+  },
+  {
+    "model": "mailing.client",
+    "pk": 5,
+    "fields": {
+      "email": "winter@test.com",
+      "first_name": "test",
+      "last_name": "test",
+      "comment": "qwer",
+      "client_list": 2
+    }
+  },
+  {
+    "model": "mailing.client",
+    "pk": 6,
+    "fields": {
+      "email": "winter1@test.com",
+      "first_name": "Егор",
+      "last_name": "Шеванов",
+      "comment": "qwer",
+      "client_list": 2
+    }
+  },
+  {
+    "model": "mailing.client",
+    "pk": 7,
+    "fields": {
+      "email": "test1@test.ru",
+      "first_name": "test1",
+      "last_name": "test1",
+      "comment": "test1",
+      "client_list": 3
+    }
+  },
+  {
+    "model": "mailing.client",
+    "pk": 8,
+    "fields": {
+      "email": "test2@test.ru",
+      "first_name": "test2",
+      "last_name": "test2",
+      "comment": "test2",
+      "client_list": 3
+    }
+  }
+]

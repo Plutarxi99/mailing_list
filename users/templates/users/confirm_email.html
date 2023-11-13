@@ -1,0 +1,11 @@
+{% extends "mailing/base.html" %}
+
+{% block content %}
+<div class="alert alert-success" role="alert">
+    {% autoescape off %}
+    http://127.0.0.1:8000{% url 'users:email_confirmed' uidb64=uid token=token %}
+    {% endautoescape %}
+    <h4 class="alert-heading">Электронная почта {{ object.email }} подтверждена</h4>
+    <p>Ваш адрес электронной почты успешно подтвержден. Спасибо за регистрацию!</p>
+</div>
+{% endblock %}

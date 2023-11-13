@@ -1,0 +1,41 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="cpl-6">
+        <div class="card">
+            <div class="card-header">{{ object.email }}</div>
+            <div class="card-body">
+                <table class="table table-striped">
+
+                    <tr>
+                        <th>Время рассылки</th>
+                        <th>Периодичность</th>
+                        <th>Статус рассылки</th>
+                    </tr>
+                    {% for mailing_item in object.mailingsetting_set.all %}
+                    <tr>
+                        <td>
+                            {{ mailing_item.mailing_set_time}}
+                        </td>
+                        <td>
+                            {{ mailing_item.mailing_set_frequency }}
+                        </td>
+                        <td>
+                            {% if mailing_item.mailing_set_is_status == 'create'%}
+                            <p class="text-success">{{ mailing_item.mailing_set_is_status }}</p>
+                            {% elif mailing_item.mailing_set_is_status == 'finish'%}
+                            <p class="text-danger">{{ mailing_item.mailing_set_is_status }}</p>
+                            {% else %}
+                            <p class="text-warning">{{ mailing_item.mailing_set_is_status }}</p>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

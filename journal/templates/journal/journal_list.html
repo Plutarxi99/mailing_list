@@ -1,0 +1,36 @@
+{% extends 'mailing/base.html' %}
+
+{% load my_tags %}
+
+{% block content %}
+<div class="coc-12 mb-5">
+    <a class="btn btn-outline-primary" href="{% url 'journal:create' %}">Добавить блог</a>
+</div>
+{% for object in object_list %}
+<div class="card" style="width: 18rem;">
+    <img src="" class="card-img-top" alt="Card image cap">
+    <div class="card-body">
+        <h5 class="card-title">{{ object|title }}</h5>
+        <p class="card-text">{{ object.content | truncatechars:100 }}</p>
+    </div>
+
+    <div class="card-body">
+        <div class="btn-group">
+            <a href="{% url 'journal:view' object.pk %}" type="button"
+               class="btn btn-sm btn-outline-secondary">View</a>
+            <a href="{% url 'journal:edit' object.pk %}" type="button"
+               class="btn btn-sm btn-outline-secondary">Edit</a>
+            <a href="{% url 'journal:delete' object.pk %}" type="button"
+               class="btn btn-sm btn-outline-secondary">Delete</a>
+        </div>
+    </div>
+    <div class="card-footer">
+        {% if object.published_is %}
+        <a class="btn btn-success" href="{% url 'journal:published_is' object.pk %}" type="button">Publish</a>
+        {% else %}
+        <a class="btn btn-warning" href="{% url 'journal:published_is' object.pk %}" type="button">not Publish</a>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

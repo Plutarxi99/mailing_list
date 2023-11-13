@@ -1,0 +1,44 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+<div class="footer">
+    <a type="button" class="btn btn-primary" aria-current="page" href="{% url 'mailing:client_create' %}">Создать клиента</a>
+</div>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">email</th>
+        <th scope="col">Подключен к списку рассылки</th>
+        <th scope="col">Статус отправки</th>
+        <th scope="col">Управление клиентом</th>
+    </tr>
+    </thead>
+    {% for object in object_list %}
+    <tbody>
+    <tr>
+    <tr class="№">
+        <th scope="row">{{ object.email }}</th>
+        <td>{{ object.client_list.client_list_name }}</td>
+        <td>
+            {% for status in object.client_list.mailingsetting_set.all %}
+            {% if status.mailing_log.mailing_log_is_status_try %}
+                    <p class="text-success">{{ status.mailing_log.mailing_log_is_status_try }}</p>
+            {% else %}
+                    <p class="text-warning">{{ status.mailing_log.mailing_log_is_status_try }}</p>
+            {% endif %}
+            {% endfor %}
+        </td>
+                <td>
+            <div class="btn-group">
+                <a href="{% url 'mailing:client_view' object.pk %}" type="button"
+                   class="btn btn-sm btn-outline-secondary">View</a>
+                <a href="{% url 'mailing:client_update' object.pk %}" type="button"
+                   class="btn btn-sm btn-outline-secondary">Edit</a>
+                <a href="{% url 'mailing:client_delete' object.pk %}" type="button"
+                   class="btn btn-sm btn-outline-secondary">Delete</a>
+            </div>
+        </td>
+    </tbody>
+    {% endfor %}
+</table>
+{% endblock %}
