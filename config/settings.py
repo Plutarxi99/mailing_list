@@ -39,11 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 
     'mailing',
     'django_crontab',
+    'users',
+    'journal',
 ]
-
+SITE_ID = 1
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -139,11 +142,11 @@ SERVER_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
 
 # Для авторизации обязательный параметр
-# AUTH_USER_MODEL = 'users.User'
-# # Редирект на домашнюю страницу
-# LOGOUT_REDIRECT_URL = '/'
-# LOGIN_REDIRECT_URL = '/'
-# LOGIN_URL = '/users/'
+AUTH_USER_MODEL = 'users.User'
+# Редирект на домашнюю страницу
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/users/'
 
 NULLABLE = ast.literal_eval(os.getenv('NULLABLE'))
 
@@ -155,7 +158,9 @@ CACHES = {
     }
 }
 
-CRONTIME=os.getenv('CRONTIME')
+# Установка времени для автоматического начало работы скрипта и задержка времени в файле cron.py
+CRONTIME = os.getenv('CRONTIME')
+CURRENT_TIME = os.getenv('CURRENT_TIME')
 CRONJOBS = [
     (CRONTIME, 'mailing.cron.my_scheduled_job')
 ]

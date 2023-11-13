@@ -1,61 +1,50 @@
-import os
+import calendar
+
 import datetime
 
-from config.settings import CRONTIME
+from django.utils.timezone import now
+from mailing.services.cron import get_list_client, change_status_mailing, create_default_log, \
+    send_mail_condition_and_log_days
 from mailing.models import Client, MailingSetting
-from mailing.views import mailing_send_mail, ClientListView, MailingSettingUpdateView
-
-
-def get_list_client(list_client_pk: int) -> list:
-    """
-    Получение списка клиентов, которые относятся к распродаже
-        example:
-            ['winter1@test.com', 'winter@test.com']
-    @param list_client_pk: идентификатор распродажи, полученный из ClientList
-    @return: list
-    """
-    email_list_client = Client.objects.values_list("email", flat=True).filter(client_list_id=list_client_pk)
-    return email_list_client
 
 
 def my_scheduled_job():
     m_set = MailingSetting.objects.all()
     for sail in m_set:
-        list_client_pk = sail.client_list.pk  # получение идентификатора для получения списка клиентов
+        # получение идентификатора для получения списка клиентов и получение списка клиента
+        list_client_pk = sail.client_list.pk
         email_list_client = get_list_client(list_client_pk)
-
         # Получение темы и тело сообщения
-        # topic = sail.mailing_message_name.mailing_message_topic
-        # body = sail.mailing_message_name.mailing_message_body
-        mail = MailingSettingUpdateView.get_object(sail)
-        print(mail)
-        print(sail.mailing_set_is_status)
-            # mailing_send_mail(
-            #     mailing_message_topic=topic,
-            #     mailing_message_body=body,
-            #     list_client=email_list_client
-            # )
+        topic = sail.mailing_message_name.mailing_message_topic
+        body = sail.mailing_message_name.mailing_message_body
 
+        # Обновляем статус рассылки, зависит от настоящего времени
+        change_status_mailing(sail.pk)
 
+        # Если флаг ссылки запущен, то запускается ссылка
+        if sail.mailing_set_is_status == 'run':
 
+            create_default_log(list_client_pk)
+            mail_time = sail.mailing_set_date
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            # Если флаг установлен на каждый день и время рассылки больше времени, чем сейчас
+            if sail.mailing_set_frequency == 'day':
+                print('day')
+                send_mail_condition_and_log_days(list_client_pk, 1, topic, body, email_list_client)
+            elif sail.mailing_set_frequency == 'week':
+                print('week')
+                send_mail_condition_and_log_days(list_client_pk, 7, topic, body, email_list_client)
+            elif sail.mailing_set_frequency == 'month':
+                print('month')
+                # Получение дней в месяце
+                days_in_month = calendar.monthrange(year=now().year, month=now().month)[1]
+                send_mail_condition_and_log_days(list_client_pk, days_in_month, topic, body, email_list_client)
+        elif sail.mailing_set_is_status == 'create':
+            print('Рассылка создана')
+            pass
+        else:
+            print('Рассылка закончилась')
+            pass
 
     # client = Client.objects.filter(client_list_id=1)
     # for cl in client:
@@ -113,6 +102,76 @@ def my_scheduled_job():
     #                 # print(client.mailinglog_set.all().mailing_log_last_try)
     #
     #
+    # def send_mail_condition_and_log(pk: int, days: int, topic: str, body: str, email_list_client: list) -> None:
+    #     """
+    #     Проверка условий и запись логов
+    #     @param pk(int): идентификатор распродажи
+    #     @param days: разница в днях между последней попыткой и сегодняшней датой
+    #     @param topic: тема сообщения
+    #     @param body: тело сообщения
+    #     @param email_list_client: список получателей
+    #     """
+    #     # mailingsetting_item = get_object_or_404(MailingSetting, pk=pk)
+    #     # last_try = mailingsetting_item.mailing_log.mailing_log_last_try
+    #     # delta = now() - last_try
+    #     # print(delta.days)
+    #     # if delta.days >= days:
+    #     #     print('отправка сообщений')
+    #     # Отправка рассылки
+    #     # mailing_send_mail(
+    #     #     mailing_message_topic=topic,
+    #     #     mailing_message_body=body,
+    #     #     list_client=email_list_client
+    #     # )
+    #     # create_log(pk=pk, mailing_log_last_try=now(), mailing_log_is_status_try=True, mailing_log_response_server='200')
+    #     mailingsetting_item = get_object_or_404(MailingSetting, pk=pk)
+    #     timedate_mailing = mailingsetting_item.mailing_set_date
+    #     timedate_now = now()
+    #     print(mailingsetting_item.mailing_set_name)
+    #     print(timedate_mailing, 'дата рассылки')
+    #     print(timedate_now, 'дата на данный момент')
+    #     # time.struct_time(tm_year=2023, tm_mon=11, tm_mday=9, tm_hour=18, tm_min=0, tm_sec=0, tm_wday=3, tm_yday=313, tm_isdst=-1) время рассылки получение значений
+    #     timedate_mailing_tuple_isocalendar = datetime.datetime.timetuple(timedate_mailing)
+    #     timedate_now_tuple = timedate_now.timetuple()
+    #     print(timedate_mailing_tuple_isocalendar, 'время рассылки получение значений')
+    #     print(timedate_now_tuple, 'время сейчас получение значений')
+    #     print(timedate_mailing, 'секунды время рассылки')
+    #
+    #     delta_datetime_mail = timedate_mailing - timedate_now
+    #     print(delta_datetime_mail, 'разница дат время сейчас и время рассылки')
+    #
+    #     delta_datetime_second_mail = delta_datetime_mail.seconds
+    #     print(delta_datetime_second_mail, 'разница в секундах до рассылки')
+    #     current_time = datetime.timedelta(00, 120, 00).seconds
+    #
+    #     if timedate_mailing_tuple_isocalendar.tm_yday == timedate_now_tuple.tm_yday and delta_datetime_second_mail <= current_time:
+    #         print('первое условие выполнения, что день и месяц совпадают')
+
+    # current_time = datetime.timedelta(00, 120, 00).seconds
+    # print(current_time, 'установка времени')
+    # if delta_datetime_second_mail <= current_time:
+    #     print('Рассылка началась')
+    #     time.sleep(delta_datetime_second_mail)
+    #     print(now())
+    #     delta_second_sleep = timedate_now - timedate_mailing
+    #     print(delta_second_sleep, 'разница в дате')
+    #     print(delta_second_sleep.seconds, 'разница в секундах')
+    # else:
+    #     print('Время ещё не наступило для рассылки')
+
+    # time.sleep(second_sleep)
+    # datatime_send_mail = time_mail + now().date()
+    # delta = now() - time_mail
+    # print(datatime_send_mail.days)
+    # if delta.days >= days:
+    #     print('отправка сообщений')
+    # Отправка рассылки
+    # mailing_send_mail(
+    #     mailing_message_topic=topic,
+    #     mailing_message_body=body,
+    #     list_client=email_list_client
+    # )
+    # create_log(pk=pk, mailing_log_last_try=now(), mailing_log_is_status_try=True, mailing_log_response_server='200')
     #             elif mailing_set_frequency == 'week':
     #                 emails = client.email
     #                 print(emails)

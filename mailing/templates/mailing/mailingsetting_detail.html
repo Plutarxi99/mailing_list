@@ -1,0 +1,57 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="cpl-6">
+        <div class="card">
+            <div class="card-header">{{ object.email }}</div>
+            <div class="card-body">
+                <table class="table table-striped">
+
+                    <tr>
+                        <th>Названия рассылка</th>
+                        <th>Время рассылки</th>
+                        <th>Начало рассылки</th>
+                        <th>Конец рассылки</th>
+                        <th>Переодичность рассылки</th>
+                        <th>Статус рассылки</th>
+                        <th>Названия сообщения рассылки</th>
+                        <th>Список клиентов</th>
+                        <th>Количество рассылок</th>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            {{ object.mailing_set_name }}
+                        </td>
+                        <td>
+                            {{ object.mailing_set_date }}
+                        </td>
+                        <td>
+                            {{ object.mailing_set_start_time }}
+                        </td>
+                        <td>
+                            {{ object.mailing_set_end_time }}
+                        </td>
+                        <td>
+                            {{ object.mailing_set_frequency }}
+                        </td>
+                        <td>
+                            {{ object.mailing_set_is_status }}
+                        </td>
+                        <td>
+                            {{ object.mailing_message_name.mailing_message_name }}
+                        </td>
+                        <td>
+                            {{ object.client_list.client_list_name }}
+                        </td>
+                        <td>
+                            {{ object.mailing_log.mailing_log_count_send_mail }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

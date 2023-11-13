@@ -3,8 +3,10 @@
 
 {% block content %}
 <div class="footer">
-    <a type="button" class="btn btn-primary" aria-current="page" href="{% url 'mailing:client_create' %}">Создать</a>
-    <a type="button" class="btn btn-primary" aria-current="page" href="#">Отправить</a>
+
+    <a type="button" class="btn btn-primary" aria-current="page" href="{% url 'mailing:mailing_create' %}">Создать
+        рассылку</a>
+
 </div>
 <table class="table">
     <thead>
@@ -14,8 +16,6 @@
         <th scope="col">Конец рассылки</th>
         <th scope="col">Периодичность рассылки</th>
         <th scope="col">Состояние рассылки</th>
-        <th scope="col">Названия сообщения рассылки</th>
-        <th scope="col">Названия списка клиентов рассылки</th>
         <th scope="col">Управление рассылкой</th>
     </tr>
     </thead>
@@ -27,19 +27,19 @@
         <td>{{ object.mailing_set_start_time }}</td>
         <td>{{ object.mailing_set_end_time }}</td>
         <td>{{ object.mailing_set_frequency }}</td>
-
         <td>
             {{ object.mailing_set_is_status }}
         </td>
-
-        <td>{{ object.mailing_message_name.mailing_message_name }}</td>
-        <td>{{ object.client_list.client_list_name }}</td>
         <td>
             <div class="btn-group">
-                <a href="#" type="button"
+                {% if perms.mailing.view_mailingsetting %}
+                <a href="{% url 'mailing:mailing_detail' object.pk %}" type="button"
                    class="btn btn-sm btn-outline-secondary">View</a>
+                {% endif %}
+                {% if perms.mailing.change_mailingsetting %}
                 <a href="{% url 'mailing:mailing_update' object.pk %}" type="button"
                    class="btn btn-sm btn-outline-secondary">Edit</a>
+                {% endif %}
                 <a href="{% url 'mailing:mailing_delete' object.pk %}" type="button"
                    class="btn btn-sm btn-outline-secondary">Delete</a>
             </div>
