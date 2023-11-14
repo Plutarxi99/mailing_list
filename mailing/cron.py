@@ -39,6 +39,7 @@ def my_scheduled_job():
                 # Получение дней в месяце
                 days_in_month = calendar.monthrange(year=now().year, month=now().month)[1]
                 send_mail_condition_and_log_days(mailing_pk, days_in_month, topic, body, email_list_client)
+
         elif sail.is_status == 'create':
             print('Рассылка создана')
             pass

@@ -3,10 +3,9 @@
 
 {% block content %}
 <div class="footer">
-
-    <a type="button" class="btn btn-primary" aria-current="page" href="{% url 'mailing:mailing_create' %}">Создать
-        рассылку</a>
-
+    <a type="button" class="btn btn-primary" aria-current="page" href="{% url 'mailing:mailing_create' %}">Создать рассылку</a>
+    <a type="button" class="btn btn-primary" aria-current="page" href="{% url 'mailing:list_client' %}">Список клиентов</a>
+    <a type="button" class="btn btn-primary" aria-current="page" href="{% url 'mailing:mailing_message_list' %}">Список сообщений</a>
 </div>
 <table class="table">
     <thead>

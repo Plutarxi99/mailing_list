@@ -166,3 +166,4 @@ CURRENT_TIME = os.getenv('CURRENT_TIME')
 CRONJOBS = [
     (CRONTIME, 'mailing.cron.my_scheduled_job')
 ]
+

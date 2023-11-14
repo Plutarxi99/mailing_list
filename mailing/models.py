@@ -1,6 +1,8 @@
+import calendar
 import datetime
 from django.conf import settings
 from django.utils import timezone
+from django.utils.timezone import now
 
 from config.settings import NULLABLE
 from django.db import models
@@ -33,6 +35,23 @@ class MailingLog(models.Model):
         verbose_name_plural = 'Логи рассылок'
 
 
+class Client(models.Model):
+    email = models.EmailField(verbose_name='email', unique=True)
+    first_name = models.CharField(max_length=150, verbose_name='имя', **NULLABLE)
+    last_name = models.CharField(max_length=150, verbose_name='фамилия', **NULLABLE)
+    comment = models.TextField(verbose_name='комментарий', **NULLABLE)
+
+    created_client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                              verbose_name='создатель клиента')
+
+    def __str__(self):
+        return f'{self.first_name} {self.last_name} ({self.email})'
+
+    class Meta:
+        verbose_name = 'клиент'
+        verbose_name_plural = 'клиенты'
+
+
 class MailingSetting(models.Model):
     DAY = 'day'
     WEEK = 'week'
@@ -51,6 +70,7 @@ class MailingSetting(models.Model):
 
     name = models.CharField(max_length=200, verbose_name='Названия рассылки')
     date_mailing = models.DateTimeField(default=timezone.now, verbose_name='дата рассылки')
+    next_time_run = models.DateTimeField(default=timezone.now, verbose_name='дата следующей рассылки')
     start_time = models.DateTimeField(default=timezone.now, verbose_name='начало рассылки')
     end_time = models.DateTimeField(default=timezone.now, verbose_name='конец рассылки')
     frequency = models.CharField(choices=FREQUENCY, verbose_name='периодичность', **NULLABLE)
@@ -63,11 +83,17 @@ class MailingSetting(models.Model):
 
     mailing_log = models.ForeignKey(MailingLog, on_delete=models.SET_NULL, verbose_name='mailing_log', **NULLABLE)
 
+    client = models.ManyToManyField(Client, verbose_name='относится к рассылке')
+
+
     def __init__(self, *args, **kwargs):
         super(MailingSetting, self).__init__(*args, **kwargs)
         self._is_status = self.is_status
         self._start_time = self.start_time
         self._end_time = self.end_time
+        self._next_time_run = self.next_time_run
+        self._date_mailing = self.date_mailing
+        self._frequency = self.frequency
 
     def save(self, *args, **kwargs):
         """
@@ -81,6 +107,14 @@ class MailingSetting(models.Model):
             self.is_status = 'create'
         elif self.start_time.timestamp() < time_now < self.end_time.timestamp():
             self.is_status = 'run'
+            if self.frequency == 'day':
+                self.next_time_run = self.date_mailing + datetime.timedelta(days=1)
+            elif self.frequency == 'week':
+                self.next_time_run = self.date_mailing + datetime.timedelta(days=7)
+            elif self.frequency == 'month':
+                # Получение дней в месяце
+                days_in_month = calendar.monthrange(year=now().year, month=now().month)[1]
+                self.next_time_run = self.date_mailing + datetime.timedelta(days=days_in_month)
         else:
             self.is_status = 'finish'
         super(MailingSetting, self).save(*args, **kwargs)
@@ -91,22 +125,3 @@ class MailingSetting(models.Model):
     class Meta:
         verbose_name = 'Настройка рассылки'
         verbose_name_plural = 'Настройки рассылки'
-
-
-class Client(models.Model):
-    email = models.EmailField(verbose_name='email', unique=True)
-    first_name = models.CharField(max_length=150, verbose_name='имя', **NULLABLE)
-    last_name = models.CharField(max_length=150, verbose_name='фамилия', **NULLABLE)
-    comment = models.TextField(verbose_name='комментарий', **NULLABLE)
-
-    owner = models.ManyToManyField(MailingSetting, verbose_name='относится к рассылке')
-
-    created_client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-                              verbose_name='создатель клиента')
-
-    def __str__(self):
-        return f'{self.first_name} {self.last_name} ({self.email})'
-
-    class Meta:
-        verbose_name = 'клиент'
-        verbose_name_plural = 'клиенты'
