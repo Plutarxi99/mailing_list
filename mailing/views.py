@@ -23,10 +23,10 @@ class ClientListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset(*args, **kwargs)
-        if self.request.user.is_superuser: # self.request.user.groups.filter(name='Manager').exists() or
+        if self.request.user.groups.filter(name='Manager').exists() or self.request.user.is_superuser:
             return queryset
         else:
-            return queryset.filter(client_owner=self.request.user)
+            return queryset.filter(created_client=self.request.user)
 
 
 class ClientDetailView(LoginRequiredMixin, DetailView):
@@ -45,7 +45,7 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
         @return:
         """
         self.object = form.save()
-        self.object.owner = self.request.user
+        self.object.created_client = self.request.user
         self.object.save()
         return super().form_valid(form)
 
@@ -87,8 +87,11 @@ class MailingSettingListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset(*args, **kwargs)
-        queryset = queryset.filter(mailing_set_owner=self.request.user)
-        return queryset
+        if self.request.user.groups.filter(name='Manager').exists() or self.request.user.is_superuser:
+            return queryset
+        else:
+            return queryset.filter(owner=self.request.user)
+        # return queryset
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -189,7 +192,7 @@ class HomeTemplateView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        context['mailing_setting_run'] = MailingSetting.objects.filter(mailing_set_is_status='run')
+        context['mailing_setting_run'] = MailingSetting.objects.filter(is_status='run')
         context['client'] = Client.objects.all()
         context['journal'] = Journal.objects.order_by('?')[:3]
         return self.render_to_response(context)
