@@ -23,58 +23,40 @@ def send_mail_condition_and_log_days(pk: int, days: int, topic: str, body: str, 
     """
     mailingsetting_item = get_object_or_404(MailingSetting, pk=pk)
 
-    # Получение даты рассылки
-    timedate_mailing = mailingsetting_item.date_mailing
+    # Получение даты рассылки и даты следующей рассылки
+    date_mailing = mailingsetting_item.date_mailing
+    next_time_run = mailingsetting_item.next_time_run
 
-    # Получение даты сегодняшней
-    timedate_now = now()
-    print(mailingsetting_item.name)
-
-    # Получение дней рассылки, для прибавления к дате рассылки
-    days_mailing = mailingsetting_item.mailing_log.count_send_mail
-    print(timedate_mailing, 'дата рассылки')
-
-    # Прибавляем количество дней рассылки к дате рассылки установленной в настройках рассылки
-    timedate_mailing_plus_days = timedate_mailing + (datetime.timedelta(days=days_mailing) * days)
-    print(timedate_mailing_plus_days, 'создание даты отправки с учетом дней рассылок')
-
-    # разница дат время сейчас и время рассылки
-    delta_datetime_mail = timedate_mailing_plus_days - timedate_now
-    print(delta_datetime_mail, 'разница дат время сейчас и время рассылки')
-
-    # Получение разницы дат время сейчас и время рассылки в секундах
-    delta_datetime_second_mail = delta_datetime_mail.seconds
-    print(delta_datetime_second_mail, 'разница в секундах до рассылки')
-
-    # Получение секунд на задержку, которая установлена в CRONJOBS
-    current_time = datetime.timedelta(00, int(CURRENT_TIME), 00).seconds
-    print(current_time, 'установка времени')
-    # Если разница в секундах до времени рассылки и времени сейчас меньше устанвленной CRONJOBS, то запускается рассылка
-    if delta_datetime_second_mail <= current_time:
+    # Если сейчас лежит во временном отрезке между датой рассылки и следующей даты рассылки,
+    # то срабатывает скрипт отправки сообщений
+    if date_mailing <= now() <= next_time_run:
         print('Рассылка началась')
 
-        # Запуск задержки, чтобы сделать рассылку более точной
-        time.sleep(delta_datetime_second_mail)
-
-        # добавляем к полю count_send_mail в модели MailingLog, чтобы учитывать количество отработанных дней
-        mailing_log_count_send_mail = + 1
-        
         # Отправка рассылки
         mail = mailing_send_mail(
             mailing_message_topic=topic,
             mailing_message_body=body,
             list_client=email_tuple_client
         )
-        print(mail)
+
+        # Если отправка не вызвала ошибок, то дата следующей отправки меняется
+        if mail['status']:
+            # Установка и сохранения новой даты отправки с учетом периодичности
+            new_date_mailing = date_mailing + datetime.timedelta(days=days)
+            mailingsetting_item.date_mailing = new_date_mailing
+            mailingsetting_item.save()
+
+        count_send_mail = mailingsetting_item.mailing_log.count_send_mail
+        count_send_mail += 1
         # Создания логов
-        mailing_log_name = mailingsetting_item.name + f' №{mailing_log_count_send_mail}'
+        mailing_log_name = mailingsetting_item.name + f' №{count_send_mail}'
         create_log(pk=pk, last_try=now(), is_status_try=mail['status'],
                    response_server=mail["response"],
-                   count_send_mail=mailing_log_count_send_mail,
+                   count_send_mail=count_send_mail,
                    name=mailing_log_name)
 
     else:
-        print('Время ещё не наступило для рассылки')
+        pass
 
 
 def create_log(pk: int, last_try: str, is_status_try: bool,
@@ -142,7 +124,7 @@ def get_tuple_client(list_client_pk: int) -> tuple:
     @param list_client_pk: идентификатор распродажи, полученный из ClientList
     @return: tuple
     """
-    list_email_pk = Client.owner.through.objects.values().filter(mailingsetting_id=list_client_pk).values_list(
+    list_email_pk = MailingSetting.client.through.objects.values().filter(mailingsetting_id=list_client_pk).values_list(
         'client_id', flat=True)
     email_list_client = Client.objects.filter(id__in=[*list_email_pk]).values_list(
         'email', flat=True)

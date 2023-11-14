@@ -11,6 +11,7 @@
                     <tr>
                         <th>Названия рассылка</th>
                         <th>Время рассылки</th>
+                        <th>Время следующей рассылки</th>
                         <th>Начало рассылки</th>
                         <th>Конец рассылки</th>
                         <th>Переодичность рассылки</th>
@@ -25,6 +26,9 @@
                         </td>
                         <td>
                             {{ object.date_mailing }}
+                        </td>
+                        <td>
+                            {{ object.next_time_run }}
                         </td>
                         <td>
                             {{ object.start_time }}
