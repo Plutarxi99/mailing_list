@@ -147,8 +147,10 @@ AUTH_USER_MODEL = 'users.User'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/users/'
+SUPERUSER_EMAIL = os.getenv('SUPERUSER_EMAIL')
+SUPERUSER_PASSWORD = os.getenv('SUPERUSER_PASSWORD')
 
-NULLABLE = ast.literal_eval(os.getenv('NULLABLE'))
+NULLABLE = {'blank': True, 'null': True}
 
 CACHE_ENABLED = os.getenv('CACHE_ENABLED') == '1'
 CACHES = {

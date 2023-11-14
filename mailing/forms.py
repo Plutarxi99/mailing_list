@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.admin import widgets
 
-from mailing.models import MailingSetting, MailingMessage, Client, ClientList
+from mailing.models import MailingSetting, MailingMessage, Client
 
 
 class DateTimeInput(forms.DateTimeInput):
@@ -46,8 +46,3 @@ class ClientFormMailingMailingMessage(forms.ModelForm):
         model = MailingMessage
         fields = '__all__'
 
-
-class ClientListForm(forms.ModelForm):
-    class Meta:
-        model = ClientList
-        fields = '__all__'

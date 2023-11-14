@@ -10,9 +10,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from journal.models import Journal
-from mailing.forms import MailingSettingForm, ClientFormMailingMailingMessage, ClientForm, MailingMessageForm, \
-    ClientListForm
-from mailing.models import Client, MailingSetting, MailingMessage, MailingLog, ClientList
+from mailing.forms import MailingSettingForm, ClientFormMailingMailingMessage, ClientForm, MailingMessageForm
+from mailing.models import Client, MailingSetting, MailingMessage, MailingLog
 
 
 class ClientListView(LoginRequiredMixin, ListView):
@@ -46,7 +45,7 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
         @return:
         """
         self.object = form.save()
-        self.object.client_owner = self.request.user
+        self.object.owner = self.request.user
         self.object.save()
         return super().form_valid(form)
 
@@ -78,7 +77,7 @@ class MailingSettingCreateView(LoginRequiredMixin, CreateView):
         @return:
         """
         self.object = form.save()
-        self.object.mailing_set_owner = self.request.user
+        self.object.owner = self.request.user
         self.object.save()
         return super().form_valid(form)
 
@@ -111,7 +110,7 @@ class MailingSettingUpdateView(PermissionRequiredMixin, LoginRequiredMixin, Upda
         self.object = super().get_object(queryset)
         if self.request.user.is_superuser:
             return self.object
-        elif self.object.mailing_set_owner != self.request.user:
+        elif self.object.owner != self.request.user:
             raise Http404
         else:
             return self.object
@@ -183,25 +182,6 @@ class MailingMessageDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('mailing:mailing_message_list')
 
 
-class ClientListCreateView(CreateView):
-    model = ClientList
-    form_class = ClientListForm
-    success_url = reverse_lazy('mailing:client_list_mailing_list')
-
-
-class ClientListDeleteView(DeleteView):
-    model = ClientList
-    success_url = reverse_lazy('mailing:list_client')
-
-
-class ClientListListView(ListView):
-    model = ClientList
-
-
-class ClientListUpdateView(UpdateView):
-    model = ClientList
-    form_class = ClientListForm
-    success_url = reverse_lazy('mailing:client_list_mailing_list')
 
 
 class HomeTemplateView(TemplateView):

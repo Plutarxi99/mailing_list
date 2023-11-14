@@ -24,14 +24,14 @@ def send_mail_condition_and_log_days(pk: int, days: int, topic: str, body: str, 
     mailingsetting_item = get_object_or_404(MailingSetting, pk=pk)
 
     # Получение даты рассылки
-    timedate_mailing = mailingsetting_item.mailing_set_date
+    timedate_mailing = mailingsetting_item.date_mailing
 
     # Получение даты сегодняшней
     timedate_now = now()
-    print(mailingsetting_item.mailing_set_name)
+    print(mailingsetting_item.name)
 
     # Получение дней рассылки, для прибавления к дате рассылки
-    days_mailing = mailingsetting_item.mailing_log.mailing_log_count_send_mail
+    days_mailing = mailingsetting_item.mailing_log.count_send_mail
     print(timedate_mailing, 'дата рассылки')
 
     # Прибавляем количество дней рассылки к дате рассылки установленной в настройках рассылки
@@ -66,7 +66,7 @@ def send_mail_condition_and_log_days(pk: int, days: int, topic: str, body: str, 
             list_client=email_list_client
         )
         # Создания логов
-        mailing_log_name = mailingsetting_item.mailing_set_name + f' №{mailing_log_count_send_mail}'
+        mailing_log_name = mailingsetting_item.name + f' №{mailing_log_count_send_mail}'
         create_log(pk=pk, mailing_log_last_try=now(), mailing_log_is_status_try=mail['status'],
                    mailing_log_response_server=mail['response'],
                    mailing_log_count_send_mail=mailing_log_count_send_mail,
@@ -109,7 +109,7 @@ def create_default_log(pk: int) -> None:
     mailingsetting_item = get_object_or_404(MailingSetting, pk=pk)
     mail_log = mailingsetting_item.mailing_log
     if mail_log:
-        return 'уже создано', mailingsetting_item.mailing_set_name
+        return 'уже создано', mailingsetting_item.name
     else:
         create_log(pk=pk, mailing_log_last_try=now(), mailing_log_is_status_try=False,
                    mailing_log_response_server='404')
@@ -121,15 +121,15 @@ def change_status_mailing(pk: int) -> None:
     :param pk(int): идентификатор распродажи
     """
     mailingsetting_item = get_object_or_404(MailingSetting, pk=pk)
-    time_mailing_start = mailingsetting_item.mailing_set_start_time.timestamp()  # получение времени начало рассылки
-    time_mailing_end = mailingsetting_item.mailing_set_end_time.timestamp()  # получение времени конца рассылки
+    time_mailing_start = mailingsetting_item.start_time.timestamp()  # получение времени начало рассылки
+    time_mailing_end = mailingsetting_item.end_time.timestamp()  # получение времени конца рассылки
 
     if time_now.timestamp() < time_mailing_start:
-        mailingsetting_item.mailing_set_is_status = 'create'
+        mailingsetting_item.is_status = 'create'
     elif time_mailing_start < time_now.timestamp() <= time_mailing_end:  # если сегодня входит в промежуток времени рассылок
-        mailingsetting_item.mailing_set_is_status = 'run'
+        mailingsetting_item.is_status = 'run'
     else:
-        mailingsetting_item.mailing_set_is_status = 'finish'
+        mailingsetting_item.is_status = 'finish'
     mailingsetting_item.save()
 
 
