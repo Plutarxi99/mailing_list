@@ -1,11 +1,9 @@
 import datetime
-import time
 
 from django.core.mail import send_mass_mail
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 
-from config.settings import CURRENT_TIME
 from mailing.models import Client, MailingSetting, MailingLog
 from config.settings import SERVER_EMAIL
 
@@ -30,7 +28,6 @@ def send_mail_condition_and_log_days(pk: int, days: int, topic: str, body: str, 
     # Если сейчас лежит во временном отрезке между датой рассылки и следующей даты рассылки,
     # то срабатывает скрипт отправки сообщений
     if date_mailing <= now() <= next_time_run:
-        print('Рассылка началась')
 
         # Отправка рассылки
         mail = mailing_send_mail(
@@ -104,12 +101,12 @@ def change_status_mailing(pk: int) -> None:
     :param pk(int): идентификатор распродажи
     """
     mailingsetting_item = get_object_or_404(MailingSetting, pk=pk)
-    time_mailing_start = mailingsetting_item.start_time.timestamp()  # получение времени начало рассылки
-    time_mailing_end = mailingsetting_item.end_time.timestamp()  # получение времени конца рассылки
+    time_mailing_start = mailingsetting_item.start_time  # получение времени начало рассылки
+    time_mailing_end = mailingsetting_item.end_time  # получение времени конца рассылки
 
-    if time_now.timestamp() < time_mailing_start:
+    if now() < time_mailing_start:
         mailingsetting_item.is_status = 'create'
-    elif time_mailing_start < time_now.timestamp() <= time_mailing_end:  # если сегодня входит в промежуток времени рассылок
+    elif time_mailing_start < now() <= time_mailing_end:  # если сегодня входит в промежуток времени рассылок
         mailingsetting_item.is_status = 'run'
     else:
         mailingsetting_item.is_status = 'finish'
