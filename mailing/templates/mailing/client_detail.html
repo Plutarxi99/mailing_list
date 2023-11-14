@@ -9,30 +9,15 @@
                 <table class="table table-striped">
 
                     <tr>
-                        <th>Время рассылки</th>
-                        <th>Периодичность</th>
-                        <th>Статус рассылки</th>
+                        <th>Имя</th>
+                        <th>Фамилия</th>
+                        <th>Комментарий</th>
                     </tr>
-                    {% for mailing_item in object.mailingsetting_set.all %}
                     <tr>
-                        <td>
-                            {{ mailing_item.mailing_set_time}}
-                        </td>
-                        <td>
-                            {{ mailing_item.mailing_set_frequency }}
-                        </td>
-                        <td>
-                            {% if mailing_item.mailing_set_is_status == 'create'%}
-                            <p class="text-success">{{ mailing_item.mailing_set_is_status }}</p>
-                            {% elif mailing_item.mailing_set_is_status == 'finish'%}
-                            <p class="text-danger">{{ mailing_item.mailing_set_is_status }}</p>
-                            {% else %}
-                            <p class="text-warning">{{ mailing_item.mailing_set_is_status }}</p>
-                            {% endif %}
-                        </td>
+                        <td>object.first_name</td>
+                        <td>object.last_name</td>
+                        <td>object.comment</td>
                     </tr>
-
-                    {% endfor %}
                 </table>
             </div>
         </div>

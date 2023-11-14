@@ -21,12 +21,12 @@ class MailingSettingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['mailing_set_date'].widget = DateTimeInput()
-        self.fields['mailing_set_date'].input_formats = ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"]
-        self.fields['mailing_set_start_time'].widget = DateTimeInput()
-        self.fields['mailing_set_start_time'].input_formats = ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"]
-        self.fields['mailing_set_end_time'].widget = DateTimeInput()
-        self.fields['mailing_set_end_time'].input_formats = ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"]
+        self.fields['date_mailing'].widget = DateTimeInput()
+        self.fields['date_mailing'].input_formats = ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"]
+        self.fields['start_time'].widget = DateTimeInput()
+        self.fields['start_time'].input_formats = ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"]
+        self.fields['end_time'].widget = DateTimeInput()
+        self.fields['end_time'].input_formats = ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"]
 
 
 class ClientForm(forms.ModelForm):

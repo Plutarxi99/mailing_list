@@ -15,8 +15,7 @@
                         <th>Конец рассылки</th>
                         <th>Переодичность рассылки</th>
                         <th>Статус рассылки</th>
-                        <th>Названия сообщения рассылки</th>
-                        <th>Список клиентов</th>
+                        <th>Названия темы сообщения рассылки</th>
                         <th>Количество рассылок</th>
                     </tr>
 
@@ -40,7 +39,7 @@
                             {{ object.is_status }}
                         </td>
                         <td>
-                            {{ object.mailing_message_name.name }}
+                            {{ object.mailing_message_name.topic }}
                         </td>
                         <td>
                             {{ object.mailing_log.count_send_mail }}
