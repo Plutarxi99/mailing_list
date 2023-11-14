@@ -22,31 +22,28 @@
 
                     <tr>
                         <td>
-                            {{ object.mailing_set_name }}
+                            {{ object.name }}
                         </td>
                         <td>
-                            {{ object.mailing_set_date }}
+                            {{ object.date_mailing }}
                         </td>
                         <td>
-                            {{ object.mailing_set_start_time }}
+                            {{ object.start_time }}
                         </td>
                         <td>
-                            {{ object.mailing_set_end_time }}
+                            {{ object.end_time }}
                         </td>
                         <td>
-                            {{ object.mailing_set_frequency }}
+                            {{ object.frequency }}
                         </td>
                         <td>
-                            {{ object.mailing_set_is_status }}
+                            {{ object.is_status }}
                         </td>
                         <td>
-                            {{ object.mailing_message_name.mailing_message_name }}
+                            {{ object.mailing_message_name.name }}
                         </td>
                         <td>
-                            {{ object.client_list.client_list_name }}
-                        </td>
-                        <td>
-                            {{ object.mailing_log.mailing_log_count_send_mail }}
+                            {{ object.mailing_log.count_send_mail }}
                         </td>
                     </tr>
                 </table>

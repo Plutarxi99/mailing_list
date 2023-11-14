@@ -3,20 +3,20 @@ import calendar
 import datetime
 
 from django.utils.timezone import now
-from mailing.services.cron import get_list_client, change_status_mailing, create_default_log, \
+from mailing.services.cron import get_tuple_client, change_status_mailing, create_default_log, \
     send_mail_condition_and_log_days
-from mailing.models import Client, MailingSetting
+from mailing.models import MailingSetting
 
 
 def my_scheduled_job():
     m_set = MailingSetting.objects.all()
     for sail in m_set:
         # получение идентификатора для получения списка клиентов и получение списка клиента
-        list_client_pk = sail.client_list.pk
-        email_list_client = get_list_client(list_client_pk)
+        mailing_pk = sail.pk
+        email_list_client = get_tuple_client(mailing_pk)
         # Получение темы и тело сообщения
-        topic = sail.name.topic
-        body = sail.name.body
+        topic = sail.mailing_message_name.topic
+        body = sail.mailing_message_name.body
 
         # Обновляем статус рассылки, зависит от настоящего времени
         change_status_mailing(sail.pk)
@@ -24,21 +24,21 @@ def my_scheduled_job():
         # Если флаг ссылки запущен, то запускается ссылка
         if sail.is_status == 'run':
 
-            create_default_log(list_client_pk)
+            create_default_log(mailing_pk)
             mail_time = sail.date_mailing
 
             # Если флаг установлен на каждый день и время рассылки больше времени, чем сейчас
             if sail.frequency == 'day':
                 print('day')
-                send_mail_condition_and_log_days(list_client_pk, 1, topic, body, email_list_client)
+                send_mail_condition_and_log_days(mailing_pk, 1, topic, body, email_list_client)
             elif sail.frequency == 'week':
                 print('week')
-                send_mail_condition_and_log_days(list_client_pk, 7, topic, body, email_list_client)
+                send_mail_condition_and_log_days(mailing_pk, 7, topic, body, email_list_client)
             elif sail.frequency == 'month':
                 print('month')
                 # Получение дней в месяце
                 days_in_month = calendar.monthrange(year=now().year, month=now().month)[1]
-                send_mail_condition_and_log_days(list_client_pk, days_in_month, topic, body, email_list_client)
+                send_mail_condition_and_log_days(mailing_pk, days_in_month, topic, body, email_list_client)
         elif sail.is_status == 'create':
             print('Рассылка создана')
             pass
