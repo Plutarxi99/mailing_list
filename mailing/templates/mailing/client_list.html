@@ -8,7 +8,6 @@
     <thead>
     <tr>
         <th scope="col">email</th>
-        <th scope="col">Подключен к списку рассылки</th>
         <th scope="col">Статус отправки</th>
         <th scope="col">Управление клиентом</th>
     </tr>
@@ -18,7 +17,7 @@
     <tr>
     <tr class="№">
         <th scope="row">{{ object.email }}</th>
-        <td>{{ object.client_list.client_list_name }}</td>
+        <td>{{ object.owner.values }}</td>
         <td>
             {% for status in object.client_list.mailingsetting_set.all %}
             {% if status.mailing_log.mailing_log_is_status_try %}
