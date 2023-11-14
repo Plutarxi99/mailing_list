@@ -5,8 +5,7 @@ from mailing.models import Client
 from mailing.views import ClientListView, ClientDetailView, \
     MailingSettingCreateView, MailingSettingListView, MailingSettingUpdateView, MailingSettingDeleteView, \
     ClientCreateView, ClientDeleteView, ClientUpdateView, MailingMessageListView, MailingMessageCreateView, \
-    MailingMessageDeleteView, MailingMessageUpdateView, MailingSettingDetailView, ClientListCreateView, \
-    ClientListDeleteView, ClientListListView, ClientListUpdateView, HomeTemplateView
+    MailingMessageDeleteView, MailingMessageUpdateView, MailingSettingDetailView, HomeTemplateView
 
 app_name = MailingConfig.name
 
@@ -27,11 +26,6 @@ urlpatterns = [
     path('mailing_message_create/', MailingMessageCreateView.as_view(), name='mailing_message_create'),
     path('mailing_message_delete/<int:pk>', MailingMessageDeleteView.as_view(), name='mailing_message_delete'),
     path('mailing_message_update/<int:pk>', MailingMessageUpdateView.as_view(), name='mailing_message_update'),
-    
-    path('client_list_mailing_create/', ClientListCreateView.as_view(), name='client_list_mailing_create'),
-    path('client_list_mailing_delete/<int:pk>', ClientListDeleteView.as_view(), name='client_list_mailing_delete'),
-    path('client_list_mailing_list/', ClientListListView.as_view(), name='client_list_mailing_list'),
-    path('client_list_mailing_update/<int:pk>', ClientListUpdateView.as_view(), name='client_list_mailing_update'),
 
     path('mailing/', HomeTemplateView.as_view(), name='home'),
 ]

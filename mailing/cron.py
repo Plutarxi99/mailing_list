@@ -15,31 +15,31 @@ def my_scheduled_job():
         list_client_pk = sail.client_list.pk
         email_list_client = get_list_client(list_client_pk)
         # Получение темы и тело сообщения
-        topic = sail.mailing_message_name.mailing_message_topic
-        body = sail.mailing_message_name.mailing_message_body
+        topic = sail.name.topic
+        body = sail.name.body
 
         # Обновляем статус рассылки, зависит от настоящего времени
         change_status_mailing(sail.pk)
 
         # Если флаг ссылки запущен, то запускается ссылка
-        if sail.mailing_set_is_status == 'run':
+        if sail.is_status == 'run':
 
             create_default_log(list_client_pk)
-            mail_time = sail.mailing_set_date
+            mail_time = sail.date_mailing
 
             # Если флаг установлен на каждый день и время рассылки больше времени, чем сейчас
-            if sail.mailing_set_frequency == 'day':
+            if sail.frequency == 'day':
                 print('day')
                 send_mail_condition_and_log_days(list_client_pk, 1, topic, body, email_list_client)
-            elif sail.mailing_set_frequency == 'week':
+            elif sail.frequency == 'week':
                 print('week')
                 send_mail_condition_and_log_days(list_client_pk, 7, topic, body, email_list_client)
-            elif sail.mailing_set_frequency == 'month':
+            elif sail.frequency == 'month':
                 print('month')
                 # Получение дней в месяце
                 days_in_month = calendar.monthrange(year=now().year, month=now().month)[1]
                 send_mail_condition_and_log_days(list_client_pk, days_in_month, topic, body, email_list_client)
-        elif sail.mailing_set_is_status == 'create':
+        elif sail.is_status == 'create':
             print('Рассылка создана')
             pass
         else:
