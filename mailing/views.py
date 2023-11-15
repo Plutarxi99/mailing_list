@@ -10,7 +10,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from journal.models import Journal
-from mailing.forms import MailingSettingForm, ClientFormMailingMailingMessage, ClientForm, MailingMessageForm
+from mailing.forms import MailingSettingForm, ClientForm, MailingMessageForm
 from mailing.models import Client, MailingSetting, MailingMessage, MailingLog
 
 
