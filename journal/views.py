@@ -5,6 +5,7 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 from pytils.translit import slugify
 
+from journal.forms import JournalForm
 from journal.models import Journal
 
 from django.core.mail import send_mail
@@ -12,7 +13,7 @@ from django.core.mail import send_mail
 
 class JournalCreateView(CreateView):
     model = Journal
-    fields = ('title', 'content',)
+    form_class = JournalForm
     success_url = reverse_lazy('journal:list')
 
     def form_valid(self, form):
@@ -26,9 +27,7 @@ class JournalCreateView(CreateView):
 
 class JournalUpdateView(UpdateView):
     model = Journal
-    fields = ('title', 'content',)
-
-    # success_url = reverse_lazy('journal:list')
+    form_class = JournalForm
 
     def form_valid(self, form):
         if form.is_valid:

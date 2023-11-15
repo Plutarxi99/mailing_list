@@ -151,7 +151,7 @@ SUPERUSER_EMAIL = os.getenv('SUPERUSER_EMAIL')
 SUPERUSER_PASSWORD = os.getenv('SUPERUSER_PASSWORD')
 
 NULLABLE = {'blank': True, 'null': True}
-
+RUSSIAN_BAN_WORDS = []
 CACHE_ENABLED = os.getenv('CACHE_ENABLED') == '1'
 CACHES = {
     "default": {
@@ -162,8 +162,6 @@ CACHES = {
 
 # Установка времени для автоматического начало работы скрипта и задержка времени в файле cron.py
 CRONTIME = os.getenv('CRONTIME')
-CURRENT_TIME = os.getenv('CURRENT_TIME')
 CRONJOBS = [
     (CRONTIME, 'mailing.cron.my_scheduled_job')
 ]
-
