@@ -9,37 +9,32 @@
                 <div class="card" type="center">
                     <div class="card-header">
                         <h3>
-                            Создание рассылки
+                            Создание сообщения для рассылки
                         </h3>
                     </div>
                     <div class="card-body">
                         {% csrf_token %}
                         {{ form.as_p }}
-                        <button type="submit" class="btn btn-danger">
+                        <button type="submit" class="btn btn-success">
                             {% if object %}
                             Сохранить
+                            <div class="footer">
+                                <button value="Cancel" class="btn btn-secondary " onclick="window.history.back()"
+                                        aria-current="page">Назад
+                                </button>
+                            </div>
                             {% else %}
                             Создать
+                            <div class="footer">
+                                <button value="Cancel" class="btn btn-secondary " onclick="window.history.back()"
+                                        aria-current="page">Назад
+                                </button>
+                            </div>
                             {% endif %}
                         </button>
                     </div>
                 </div>
             </div>
-<!--            <div class="col-6">-->
-<!--                <div class="card" type="center">-->
-<!--                    <div class="card-header">-->
-<!--                        <h3>-->
-<!--                            Настройки рассылки-->
-<!--                        </h3>-->
-<!--                    </div>-->
-<!--                    <div class="card-body">-->
-<!--                        {{ formset.management_form }}-->
-<!--                        {% for form in formset.forms %}-->
-<!--                            {{ form.as_p }}-->
-<!--                        {% endfor %}-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
         </div>
     </div>
 </form>
