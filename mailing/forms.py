@@ -17,7 +17,7 @@ class DateTimeInput(forms.DateTimeInput):
 class MailingSettingForm(forms.ModelForm):
     class Meta:
         model = MailingSetting
-        # fields = '__all__'
+
         exclude = ('owner', 'mailing_log', 'is_status',)
 
     def __init__(self, *args, **kwargs):
@@ -66,3 +66,4 @@ class MailingMessageForm(forms.ModelForm):
     class Meta:
         model = MailingMessage
         fields = '__all__'
+

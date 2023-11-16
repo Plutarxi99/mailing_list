@@ -75,6 +75,7 @@ class MailingSetting(models.Model):
     end_time = models.DateTimeField(default=timezone.now, verbose_name='конец рассылки')
     frequency = models.CharField(choices=FREQUENCY, verbose_name='периодичность', **NULLABLE)
     is_status = models.CharField(choices=STATUS, verbose_name='статус рассылки', **NULLABLE)
+    is_active_mailing = models.BooleanField(default=True, verbose_name='активность рассылки')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                               verbose_name='создатель рассылки')
 

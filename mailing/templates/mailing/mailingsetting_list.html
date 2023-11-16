@@ -31,14 +31,10 @@
         </td>
         <td>
             <div class="btn-group">
-                {% if perms.mailing.view_mailingsetting %}
                 <a href="{% url 'mailing:mailing_detail' object.pk %}" type="button"
                    class="btn btn-sm btn-outline-secondary">View</a>
-                {% endif %}
-                {% if perms.mailing.change_mailingsetting %}
                 <a href="{% url 'mailing:mailing_update' object.pk %}" type="button"
                    class="btn btn-sm btn-outline-secondary">Edit</a>
-                {% endif %}
                 <a href="{% url 'mailing:mailing_delete' object.pk %}" type="button"
                    class="btn btn-sm btn-outline-secondary">Delete</a>
             </div>

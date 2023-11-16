@@ -28,6 +28,7 @@ class JournalCreateView(CreateView):
 class JournalUpdateView(UpdateView):
     model = Journal
     form_class = JournalForm
+    success_url = reverse_lazy('journal:list')
 
     def form_valid(self, form):
         if form.is_valid:
@@ -44,10 +45,10 @@ class JournalUpdateView(UpdateView):
 class JournalListView(ListView):
     model = Journal
 
-    # def get_queryset(self, *args, **kwargs):
-    #     queryset = super().get_queryset(*args, **kwargs)
-    #     queryset = queryset.filter(published_is=False)
-    #     return queryset
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset(*args, **kwargs)
+        queryset = queryset.filter(published_is=False)
+        return queryset
 
 
 class JournalDetailView(DetailView):
@@ -57,9 +58,6 @@ class JournalDetailView(DetailView):
         self.object = super().get_object(queryset)
         self.object.count_view += 1
         self.object.save()
-        if self.object.count_view == 100:
-            pass
-            # send_mail_about_100_views(self.object.id)
         return self.object
 
 
@@ -77,18 +75,3 @@ def is_publish(request, pk):
     journal_item.save()
 
     return redirect(reverse('journal:list'))
-#
-#
-# def send_mail_about_100_views(journal_id: int):
-#     journal = Journal.objects.get(pk=journal_id)
-#     if journal.count_view != 100:
-#         logger.error(
-#             'Функция вызвана для статьи %d, к которой %d просмотров',
-#             journal.pk, journal.count_view
-#         )
-#     return send_mail(subject='Популярная статья',
-#                      message=f'Статья {journal.title} была просмотрена 100 раз',
-#                      from_email="shievanov.egor@yandex.ru",
-#                      recipient_list=["egor.shievanov@gmail.com"],
-#                      fail_silently=False,
-#                      )

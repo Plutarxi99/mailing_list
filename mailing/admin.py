@@ -21,6 +21,12 @@ class ClientAdmin(admin.ModelAdmin):
 @admin.register(MailingSetting)
 class MailingSettingAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'date_mailing', 'next_time_run','start_time', 'end_time', 'frequency', 'is_status',
+        'name', 'date_mailing', 'next_time_run', 'start_time', 'end_time', 'frequency', 'is_status',
         'mailing_message_name',
         'mailing_log',)
+
+    def get_readonly_fields(self, request, obj=None):
+        print(request.user.groups.filter(name='Manager').exists())
+        if request.user.groups.filter(name='Manager').exists():
+            return ['name', 'date_mailing', 'next_time_run', 'start_time', 'end_time', 'frequency', 'is_status', 'owner', 'mailing_message_name', 'mailing_log', 'client', ]
+        return self.readonly_fields

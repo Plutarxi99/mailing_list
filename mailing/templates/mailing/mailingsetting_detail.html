@@ -19,6 +19,7 @@
                         <th>Статус рассылки</th>
                         <th>Названия темы сообщения рассылки</th>
                         <th>Количество рассылок</th>
+                        <th>Владелец</th>
                     </tr>
 
                     <tr>
@@ -48,6 +49,9 @@
                         </td>
                         <td>
                             {{ object.mailing_log.count_send_mail }}
+                        </td>
+                        <td>
+                            {{ object.owner }}
                         </td>
                     </tr>
                 </table>

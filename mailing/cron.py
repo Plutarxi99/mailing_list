@@ -14,7 +14,7 @@ def my_scheduled_job():
         # Обновляем статус рассылки, зависит от настоящего времени
         change_status_mailing(mailingsetting_item.pk)
         # Если флаг ссылки запущен, то запускается ссылка
-        if mailingsetting_item.is_status == 'run':
+        if mailingsetting_item.is_status == 'run' and mailingsetting_item.is_active_mailing:
             # создание дефолтных логов, для заполнения нулевого лога
             create_default_log(mailing_pk)
             #  получение кортежа клиента
