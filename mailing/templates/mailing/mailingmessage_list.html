@@ -2,7 +2,8 @@
 
 {% block content %}
 <div class="footer">
-    <a type="button" class="btn btn-primary" aria-current="page" href="{% url 'mailing:mailing_message_create' %}">Создать сообщение</a>
+    <a type="button" class="btn btn-primary" aria-current="page" href="{% url 'mailing:mailing_message_create' %}">Создать
+        сообщение</a>
 </div>
 <table class="table">
     <thead>
@@ -39,4 +40,9 @@
     </tbody>
     {% endfor %}
 </table>
+<div class="footer">
+    <button value="Cancel" class="btn btn-secondary " onclick="window.history.back()"
+            aria-current="page">Назад
+    </button>
+</div>
 {% endblock %}

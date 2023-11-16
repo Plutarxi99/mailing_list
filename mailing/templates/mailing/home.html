@@ -83,6 +83,7 @@
         <h2 class="featurette-heading fw-normal lh-1">{{ journal_item.title }}
         </h2>
         <p class="lead">{{ journal_item.content | truncatechars:100 }}</p>
+        <p class="lead">Количество просмотров: {{ journal_item.count_view }}</p>
     </div>
     <div class="col-md-5">
             <img class="card-img-top"

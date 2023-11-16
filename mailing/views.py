@@ -1,17 +1,11 @@
-import random
-from random import randint
-
-from django.core.mail import send_mail
-from django.forms import inlineformset_factory
 from django.http import Http404
-from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from journal.models import Journal
 from mailing.forms import MailingSettingForm, ClientForm, MailingMessageForm
-from mailing.models import Client, MailingSetting, MailingMessage, MailingLog
+from mailing.models import Client, MailingSetting, MailingMessage
 
 
 class MailingSettingCreateView(LoginRequiredMixin, CreateView):
@@ -44,11 +38,6 @@ class MailingSettingListView(LoginRequiredMixin, ListView):
             return queryset
         else:
             return queryset.filter(owner=self.request.user)
-        # return queryset
-
-    def get_context_data(self, **kwargs):
-        context_data = super().get_context_data(**kwargs)
-        return context_data
 
 
 class MailingSettingUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
@@ -57,54 +46,27 @@ class MailingSettingUpdateView(PermissionRequiredMixin, LoginRequiredMixin, Upda
     success_url = reverse_lazy('mailing:mailing_list')
     permission_required = 'mailing.change_mailingsetting'
 
-    # def get_object(self, queryset=None):
-    #     self.object = super().get_object(queryset)
-    #     # print(self.object)
-    #     return self.object
+
 
     def get_object(self, queryset=None):
         self.object = super().get_object(queryset)
-        if self.request.user.is_superuser:
+        if self.request.user.is_superuser or self.request.user.groups.filter(name='Manager').exists():
             return self.object
         elif self.object.owner != self.request.user:
             raise Http404
         else:
             return self.object
 
-    # def has_permission(self):
-    #     """
-    #     Если у пользователя нет прав на редактирование выдаёт ошибку 403
-    #     """
-    #     perms = self.get_permission_required()
-    #     product: Product = self.get_object()
-    #     return self.request.user == product.product_creator
-    # def get_form(self, **kwargs):
-    #     """
-    #     Метод для скрытия полей редактирования продукта в edit, если пользователь не его создатель
-    #     @param **kwargs:
-    #     """
-    # form = super().get_form()
-    # if self.request.user != form.instance.product_creator:
-    # сравниваем авторизированного пользователя с создателем продукта
-    # enabled_fields = set()  # метод для добавления полей для чего ???
-    # # if self.request.user.has_perm(
-    # #         'catalog.change_name'):  # если у пользователя есть права на редактирования то разрешаем редактирование этого пользователя
-    # #     enabled_fields.add('name')  # добавляем поле для редактирования
-    # if self.request.user.has_perm('catalog.change_description'):
-    #     enabled_fields.add('description')
-    # # if self.request.user.groups.filter(name='Manager').exists(): # Если пользователь принадлежит к группе "Manager", то ему можно изменять поля
-    # #     enabled_fields.add('is_published')  # добавляем поле для редактирования
-    #
-    # if self.request.user.is_superuser:
-    #     enabled_fields.add('price')  # добавляем поле для редактирования
-    #     enabled_fields.add('category')  # добавляем поле для редактирования
-    #     enabled_fields.add('is_published')  # добавляем поле для редактирования
-    #
-    # for field_name in enabled_fields.symmetric_difference(form.fields):
-    #     form.fields[field_name].disabled = True
-    #     form.errors.pop(field_name, None)
-
-    # return form
+    def get_form(self, **kwargs):
+        form = super().get_form()
+        if not form.instance.owner == self.request.user or self.request.user.is_superuser:
+            if self.request.user.groups.filter(name='Manager').exists():
+                enabled_fields = set()
+                enabled_fields.add('is_active_mailing')
+                for field_name in enabled_fields.symmetric_difference(form.fields):
+                    form.fields[field_name].disabled = True
+                    form.errors.pop(field_name, None)
+        return form
 
 
 class MailingSettingDeleteView(LoginRequiredMixin, DeleteView):
@@ -112,9 +74,8 @@ class MailingSettingDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('mailing:mailing_list')
 
 
-class MailingSettingDetailView(PermissionRequiredMixin, LoginRequiredMixin, DetailView):
+class MailingSettingDetailView(LoginRequiredMixin, DetailView):
     model = MailingSetting
-    permission_required = 'mailing.view_mailingsetting'
 
 
 class ClientListView(LoginRequiredMixin, ListView):
@@ -183,8 +144,6 @@ class MailingMessageUpdateView(LoginRequiredMixin, UpdateView):
 class MailingMessageDeleteView(LoginRequiredMixin, DeleteView):
     model = MailingMessage
     success_url = reverse_lazy('mailing:mailing_message_list')
-
-
 
 
 class HomeTemplateView(TemplateView):
