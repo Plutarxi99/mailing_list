@@ -10,7 +10,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView as BaseLoginView
 from django.contrib.auth.views import LogoutView as BaseLogoutView
 from django.urls import reverse_lazy, reverse
@@ -41,14 +41,14 @@ class UserUpdateView(UpdateView):
     def get_object(self, queryset=None):
         return self.request.user
 
-    def form_valid(self, form):
-        self.object = form.save()
-        print(self.object)
-        self.object.user_permissions.set([34]) # "mailing.change_mailingsetting"
-        self.object.user_permissions.set([30]) # "mailing.change_mailingmessage"
-        self.object.user_permissions.set([38]) # "mailing.change_client""
-        self.object.save()
-        return super().form_valid(form)
+    # def form_valid(self, form):
+    # self.object = form.save()
+    # print(self.object)
+    # self.object.user_permissions.set([34]) # "mailing.change_mailingsetting"
+    # self.object.user_permissions.set([30]) # "mailing.change_mailingmessage"
+    # self.object.user_permissions.set([38]) # "mailing.change_client"
+    # self.object.save()
+    # return super().form_valid(form)
 
 
 class RegisterView(CreateView):
@@ -63,11 +63,11 @@ class RegisterView(CreateView):
         return context
 
     def form_valid(self, form):
-        self.object = form.save()
-        self.object.user_permissions.set([34]) # "mailing.change_mailingsetting"
-        self.object.user_permissions.set([30]) # "mailing.change_mailingmessage"
-        self.object.user_permissions.set([38]) # "mailing.change_client""
-        self.object.save()
+        # self.object = form.save()
+        # self.object.user_permissions.set([34]) # "mailing.change_mailingsetting"
+        # self.object.user_permissions.set([30]) # "mailing.change_mailingmessage"
+        # self.object.user_permissions.set([38]) # "mailing.change_client""
+        # self.object.save()
         user = form.save(commit=False)
         user.is_active = False
         user.save()
@@ -131,3 +131,24 @@ class EmailConfirmationFailedView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Ваш электронный адрес не активирован'
         return context
+
+
+class UserActiveTemplateView(PermissionRequiredMixin, LoginRequiredMixin, TemplateView):
+    template_name = 'users/user_active.html'
+    permission_required = 'users.change_user'
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        context['object_list'] = User.objects.all()
+        return self.render_to_response(context)
+
+
+def is_active_user(request, pk):
+    user_item = get_object_or_404(User, pk=pk)
+    if user_item.is_active:
+        user_item.is_active = False
+    else:
+        user_item.is_active = True
+    user_item.save()
+
+    return redirect(reverse('users:user_active'))
