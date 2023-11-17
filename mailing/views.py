@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.shortcuts import resolve_url
+from django.shortcuts import resolve_url, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -11,6 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from journal.models import Journal
 from mailing.forms import MailingSettingForm, ClientForm, MailingMessageForm
 from mailing.models import Client, MailingSetting, MailingMessage
+from users.models import User
 
 
 class MailingSettingCreateView(LoginRequiredMixin, CreateView):
@@ -60,11 +61,13 @@ class MailingSettingUpdateView(PermissionRequiredMixin, LoginRequiredMixin, Upda
         form = super().get_form()
         if not form.instance.owner == self.request.user or self.request.user.is_superuser:
             if self.request.user.groups.filter(name='Manager').exists():
+                self.request.user.user_permissions.set([30])
                 enabled_fields = set()
                 enabled_fields.add('is_active_mailing')
                 for field_name in enabled_fields.symmetric_difference(form.fields):
                     form.fields[field_name].disabled = True
                     form.errors.pop(field_name, None)
+        self.request.user.user_permissions.set([30])
         return form
 
 
@@ -131,9 +134,8 @@ class ClientUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
         return form
 
 
-class MailingMessageListView(PermissionRequiredMixin, LoginRequiredMixin, ListView):
+class MailingMessageListView(LoginRequiredMixin, ListView):
     model = MailingMessage
-    permission_required = 'mailing.view_mailingmessage'
 
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset(*args, **kwargs)
@@ -172,10 +174,12 @@ class MailingMessageUpdateView(PermissionRequiredMixin, LoginRequiredMixin, Upda
         form = super().get_form()
         if not form.instance.owner == self.request.user or self.request.user.is_superuser:
             if self.request.user.groups.filter(name='Manager').exists():
+                self.request.user.user_permissions.set([30])  # "mailing.change_mailingmessage"
                 enabled_fields = set()
                 for field_name in enabled_fields.symmetric_difference(form.fields):
                     form.fields[field_name].disabled = True
                     form.errors.pop(field_name, None)
+        self.request.user.user_permissions.set([30])  # "mailing.change_mailingmessage"
         return form
 
 
@@ -193,3 +197,5 @@ class HomeTemplateView(TemplateView):
         context['client'] = Client.objects.all()
         context['journal'] = Journal.objects.filter(published_is=False).order_by('?')[:3]
         return self.render_to_response(context)
+
+

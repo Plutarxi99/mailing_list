@@ -1,0 +1,33 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">email пользователя</th>
+        <th scope="col">Активирован ли?</th>
+    </tr>
+    </thead>
+    {% for object in object_list %}
+    <tbody>
+    <tr>
+    <tr class="№">
+        <td>{{ object.email }}</td>
+        <td>
+        {% if object.is_active %}
+        <a class="btn btn-success" href="{% url 'users:button_active' object.pk %}" type="button">Active</a>
+        {% else %}
+        <a class="btn btn-warning" href="{% url 'users:button_active' object.pk %}" type="button">not Active</a>
+        {% endif %}
+        </td>
+    </tr>
+    </tbody>
+    {% endfor %}
+</table>
+<div class="footer">
+    <button value="Cancel" class="btn btn-secondary " onclick="window.history.back()"
+            aria-current="page">Назад
+    </button>
+</div>
+
+{% endblock %}
