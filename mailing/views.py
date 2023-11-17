@@ -61,14 +61,22 @@ class MailingSettingUpdateView(PermissionRequiredMixin, LoginRequiredMixin, Upda
         form = super().get_form()
         if not form.instance.owner == self.request.user or self.request.user.is_superuser:
             if self.request.user.groups.filter(name='Manager').exists():
-                self.request.user.user_permissions.set([30])
                 enabled_fields = set()
                 enabled_fields.add('is_active_mailing')
                 for field_name in enabled_fields.symmetric_difference(form.fields):
                     form.fields[field_name].disabled = True
                     form.errors.pop(field_name, None)
-        self.request.user.user_permissions.set([30])
         return form
+
+    def has_permission(self):
+        """
+        Override this method to customize the way permissions are checked.
+        """
+        self.object = self.get_object()
+        if self.object.owner == self.request.user:
+            self.request.user.user_permissions.set([34])
+        perms = self.get_permission_required()
+        return self.request.user.has_perms(perms)
 
 
 class MailingSettingDeleteView(LoginRequiredMixin, DeleteView):
@@ -133,6 +141,16 @@ class ClientUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
                     form.errors.pop(field_name, None)
         return form
 
+    def has_permission(self):
+        """
+        Override this method to customize the way permissions are checked.
+        """
+        self.object = self.get_object()
+        if self.object.created_client == self.request.user:
+            self.request.user.user_permissions.set([38])
+        perms = self.get_permission_required()
+        return self.request.user.has_perms(perms)
+
 
 class MailingMessageListView(LoginRequiredMixin, ListView):
     model = MailingMessage
@@ -142,9 +160,7 @@ class MailingMessageListView(LoginRequiredMixin, ListView):
         if self.request.user.groups.filter(name='Manager').exists() or self.request.user.is_superuser:
             return queryset
         else:
-            pk_email = self.request.user
-            pk_mailing = MailingSetting.objects.get(owner=pk_email).mailing_message_name.pk
-            return queryset.filter(pk=pk_mailing)
+            return queryset.filter(owner=self.request.user)
 
 
 class MailingMessageCreateView(LoginRequiredMixin, CreateView):
@@ -174,13 +190,23 @@ class MailingMessageUpdateView(PermissionRequiredMixin, LoginRequiredMixin, Upda
         form = super().get_form()
         if not form.instance.owner == self.request.user or self.request.user.is_superuser:
             if self.request.user.groups.filter(name='Manager').exists():
-                self.request.user.user_permissions.set([30])  # "mailing.change_mailingmessage"
                 enabled_fields = set()
                 for field_name in enabled_fields.symmetric_difference(form.fields):
                     form.fields[field_name].disabled = True
                     form.errors.pop(field_name, None)
-        self.request.user.user_permissions.set([30])  # "mailing.change_mailingmessage"
         return form
+
+    def has_permission(self):
+        """
+        Override this method to customize the way permissions are checked.
+        """
+        self.object = self.get_object()
+        print(self.object.owner)
+        if self.object.owner == self.request.user:
+            print(1)
+            self.request.user.user_permissions.set([30])
+        perms = self.get_permission_required()
+        return self.request.user.has_perms(perms)
 
 
 class MailingMessageDeleteView(LoginRequiredMixin, DeleteView):
@@ -197,5 +223,3 @@ class HomeTemplateView(TemplateView):
         context['client'] = Client.objects.all()
         context['journal'] = Journal.objects.filter(published_is=False).order_by('?')[:3]
         return self.render_to_response(context)
-
-
