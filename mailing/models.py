@@ -42,7 +42,7 @@ class Client(models.Model):
     comment = models.TextField(verbose_name='комментарий', **NULLABLE)
 
     created_client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-                              verbose_name='создатель клиента')
+                              verbose_name='создатель клиента', **NULLABLE)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name} ({self.email})'
@@ -77,7 +77,7 @@ class MailingSetting(models.Model):
     is_status = models.CharField(choices=STATUS, verbose_name='статус рассылки', **NULLABLE)
     is_active_mailing = models.BooleanField(default=True, verbose_name='активность рассылки')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-                              verbose_name='создатель рассылки')
+                              verbose_name='создатель рассылки', **NULLABLE)
 
     mailing_message_name = models.ForeignKey(MailingMessage, on_delete=models.CASCADE,
                                              verbose_name='название рассылки сообщения')

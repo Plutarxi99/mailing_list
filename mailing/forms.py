@@ -17,8 +17,7 @@ class DateTimeInput(forms.DateTimeInput):
 class MailingSettingForm(forms.ModelForm):
     class Meta:
         model = MailingSetting
-
-        exclude = ('owner', 'mailing_log', 'is_status',)
+        exclude = ('owner', 'mailing_log', 'is_status', 'next_time_run',)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -59,11 +58,10 @@ class ClientForm(forms.ModelForm):
     class Meta:
         model = Client
         # fields = '__all__'
-        exclude = ('owner',)
+        exclude = ('created_client',)
 
 
 class MailingMessageForm(forms.ModelForm):
     class Meta:
         model = MailingMessage
         fields = '__all__'
-
