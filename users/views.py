@@ -25,6 +25,7 @@ from users.models import User
 
 class LoginView(BaseLoginView):
     template_name = 'users/login.html'
+    success_url = reverse_lazy('mailing:mailing_list')
 
 
 class LogoutView(BaseLogoutView):
@@ -40,6 +41,13 @@ class UserUpdateView(UpdateView):
     def get_object(self, queryset=None):
         return self.request.user
 
+    def form_valid(self, form):
+        self.object = form.save()
+        print(self.object)
+        self.object.user_permissions.set([34])
+        self.object.save()
+        return super().form_valid(form)
+
 
 class RegisterView(CreateView):
     model = User
@@ -53,6 +61,9 @@ class RegisterView(CreateView):
         return context
 
     def form_valid(self, form):
+        self.object = form.save()
+        self.object.user_permissions.set([34])
+        self.object.save()
         user = form.save(commit=False)
         user.is_active = False
         user.save()

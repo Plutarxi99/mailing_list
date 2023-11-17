@@ -1,4 +1,9 @@
+from urllib.parse import urlparse
+
+from django.contrib.auth.views import redirect_to_login
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
+from django.shortcuts import resolve_url
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -12,10 +17,6 @@ class MailingSettingCreateView(LoginRequiredMixin, CreateView):
     model = MailingSetting
     form_class = MailingSettingForm
     success_url = reverse_lazy('mailing:mailing_list')
-
-    def get_context_data(self, **kwargs):
-        context_data = super().get_context_data(**kwargs)
-        return context_data
 
     def form_valid(self, form):
         """
@@ -45,8 +46,6 @@ class MailingSettingUpdateView(PermissionRequiredMixin, LoginRequiredMixin, Upda
     form_class = MailingSettingForm
     success_url = reverse_lazy('mailing:mailing_list')
     permission_required = 'mailing.change_mailingsetting'
-
-
 
     def get_object(self, queryset=None):
         self.object = super().get_object(queryset)
@@ -80,10 +79,6 @@ class MailingSettingDetailView(LoginRequiredMixin, DetailView):
 
 class ClientListView(LoginRequiredMixin, ListView):
     model = Client
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context_data = super().get_context_data(**kwargs)
-        return context_data
 
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset(*args, **kwargs)
@@ -128,6 +123,15 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
 class MailingMessageListView(LoginRequiredMixin, ListView):
     model = MailingMessage
 
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset(*args, **kwargs)
+        if self.request.user.groups.filter(name='Manager').exists() or self.request.user.is_superuser:
+            return queryset
+        else:
+            pk_email = self.request.user
+            pk_mailing = MailingSetting.objects.get(owner=pk_email).mailing_message_name.pk
+            return queryset.filter(pk=pk_mailing)
+
 
 class MailingMessageCreateView(LoginRequiredMixin, CreateView):
     model = MailingMessage
@@ -153,5 +157,5 @@ class HomeTemplateView(TemplateView):
         context = self.get_context_data(**kwargs)
         context['mailing_setting_run'] = MailingSetting.objects.filter(is_status='run')
         context['client'] = Client.objects.all()
-        context['journal'] = Journal.objects.order_by('?')[:3]
+        context['journal'] = Journal.objects.filter(published_is=False).order_by('?')[:3]
         return self.render_to_response(context)

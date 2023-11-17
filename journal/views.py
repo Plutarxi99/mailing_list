@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.base import logger
 from django.urls import reverse_lazy, reverse
@@ -25,10 +26,10 @@ class JournalCreateView(CreateView):
         return super().form_valid(form)
 
 
-class JournalUpdateView(UpdateView):
+class JournalUpdateView(PermissionRequiredMixin, UpdateView):
     model = Journal
     form_class = JournalForm
-    success_url = reverse_lazy('journal:list')
+    permission_required = 'journal.change_journal'
 
     def form_valid(self, form):
         if form.is_valid:
@@ -47,7 +48,8 @@ class JournalListView(ListView):
 
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset(*args, **kwargs)
-        queryset = queryset.filter(published_is=False)
+        if not self.request.user.groups.filter(name='Manager').exists() or self.request.user.is_superuser:
+            queryset = queryset.filter(published_is=False)
         return queryset
 
 
@@ -61,9 +63,10 @@ class JournalDetailView(DetailView):
         return self.object
 
 
-class JournalDeleteView(DeleteView):
+class JournalDeleteView(PermissionRequiredMixin, DeleteView):
     model = Journal
     success_url = reverse_lazy('journal:list')
+    permission_required = 'journal.delete_journal'
 
 
 def is_publish(request, pk):

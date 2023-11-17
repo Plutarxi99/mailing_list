@@ -13,6 +13,4 @@ urlpatterns = [
     path('edit/<int:pk>/', JournalUpdateView.as_view(), name='edit'),
     path('delete/<int:pk>/', JournalDeleteView.as_view(), name='delete'),
     path('publish/<int:pk>/', is_publish, name='published_is'),
-    # path('count_view/<int:pk>/', send_email, name='count_view'),
-    # path('count_view/<int:pk>/', send_email, name='count_view'),
 ]
