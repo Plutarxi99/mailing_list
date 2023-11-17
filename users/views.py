@@ -44,7 +44,9 @@ class UserUpdateView(UpdateView):
     def form_valid(self, form):
         self.object = form.save()
         print(self.object)
-        self.object.user_permissions.set([34])
+        self.object.user_permissions.set([34]) # "mailing.change_mailingsetting"
+        self.object.user_permissions.set([30]) # "mailing.change_mailingmessage"
+        self.object.user_permissions.set([38]) # "mailing.change_client""
         self.object.save()
         return super().form_valid(form)
 
@@ -62,7 +64,9 @@ class RegisterView(CreateView):
 
     def form_valid(self, form):
         self.object = form.save()
-        self.object.user_permissions.set([34])
+        self.object.user_permissions.set([34]) # "mailing.change_mailingsetting"
+        self.object.user_permissions.set([30]) # "mailing.change_mailingmessage"
+        self.object.user_permissions.set([38]) # "mailing.change_client""
         self.object.save()
         user = form.save(commit=False)
         user.is_active = False

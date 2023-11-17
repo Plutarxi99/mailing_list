@@ -12,6 +12,9 @@ class MailingMessage(models.Model):
     topic = models.CharField(max_length=100, verbose_name='тема письма')
     body = models.TextField(verbose_name='тело письма')
 
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                              verbose_name='создатель рассылки', **NULLABLE)
+
     def __str__(self):
         return f'{self.topic}'
 
