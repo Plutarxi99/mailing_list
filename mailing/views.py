@@ -114,14 +114,26 @@ class ClientDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('mailing:list_client')
 
 
-class ClientUpdateView(LoginRequiredMixin, UpdateView):
+class ClientUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     model = Client
     success_url = reverse_lazy('mailing:list_client')
     form_class = ClientForm
+    permission_required = 'mailing.change_client'
+
+    def get_form(self, **kwargs):
+        form = super().get_form()
+        if not form.instance.created_client == self.request.user or self.request.user.is_superuser:
+            if self.request.user.groups.filter(name='Manager').exists():
+                enabled_fields = set()
+                for field_name in enabled_fields.symmetric_difference(form.fields):
+                    form.fields[field_name].disabled = True
+                    form.errors.pop(field_name, None)
+        return form
 
 
-class MailingMessageListView(LoginRequiredMixin, ListView):
+class MailingMessageListView(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     model = MailingMessage
+    permission_required = 'mailing.view_mailingmessage'
 
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset(*args, **kwargs)
@@ -138,11 +150,33 @@ class MailingMessageCreateView(LoginRequiredMixin, CreateView):
     form_class = MailingMessageForm
     success_url = reverse_lazy('mailing:mailing_message_list')
 
+    def form_valid(self, form):
+        """
+        Сохранения владельца рассылки и его прикрепление к рассылке
+        @param form:
+        @return:
+        """
+        self.object = form.save()
+        self.object.owner = self.request.user
+        self.object.save()
+        return super().form_valid(form)
 
-class MailingMessageUpdateView(LoginRequiredMixin, UpdateView):
+
+class MailingMessageUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     model = MailingMessage
     form_class = MailingMessageForm
     success_url = reverse_lazy('mailing:mailing_message_list')
+    permission_required = 'mailing.change_mailingmessage'
+
+    def get_form(self, **kwargs):
+        form = super().get_form()
+        if not form.instance.owner == self.request.user or self.request.user.is_superuser:
+            if self.request.user.groups.filter(name='Manager').exists():
+                enabled_fields = set()
+                for field_name in enabled_fields.symmetric_difference(form.fields):
+                    form.fields[field_name].disabled = True
+                    form.errors.pop(field_name, None)
+        return form
 
 
 class MailingMessageDeleteView(LoginRequiredMixin, DeleteView):
