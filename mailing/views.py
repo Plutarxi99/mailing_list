@@ -19,6 +19,16 @@ class MailingSettingCreateView(LoginRequiredMixin, CreateView):
     form_class = MailingSettingForm
     success_url = reverse_lazy('mailing:mailing_list')
 
+    def get_form_kwargs(self):
+        """
+        Переопредяем метод для получения почты владельца ,то есть того кто авторизован
+        и сохраняем в переменную для получения в forms.py queryset, которые фильтруются по владельцу
+        @return: kwargs
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
         """
         Сохранения владельца рассылки и его прикрепление к рассылке
@@ -35,6 +45,12 @@ class MailingSettingListView(LoginRequiredMixin, ListView):
     model = MailingSetting
 
     def get_queryset(self, *args, **kwargs):
+        """
+        Получение данных по владельцу или получение всех рассыылок, если ты Manager или superuser
+        @param args:
+        @param kwargs:
+        @return:queryset
+        """
         queryset = super().get_queryset(*args, **kwargs)
         if self.request.user.groups.filter(name='Manager').exists() or self.request.user.is_superuser:
             return queryset
@@ -49,6 +65,12 @@ class MailingSettingUpdateView(PermissionRequiredMixin, LoginRequiredMixin, Upda
     permission_required = 'mailing.change_mailingsetting'
 
     def get_object(self, queryset=None):
+        """
+        Получение данных по владельцу или получение всех рассыылок, если ты Manager или superuser
+        @param args:
+        @param kwargs:
+        @return:queryset
+        """
         self.object = super().get_object(queryset)
         if self.request.user.is_superuser or self.request.user.groups.filter(name='Manager').exists():
             return self.object
@@ -58,6 +80,12 @@ class MailingSettingUpdateView(PermissionRequiredMixin, LoginRequiredMixin, Upda
             return self.object
 
     def get_form(self, **kwargs):
+        """
+        Получение формы без ограничений, если ты владалец данных, иначе
+        ты получаешь форму с невозмодностью редактировать поля
+        @param kwargs:
+        @return:
+        """
         form = super().get_form()
         if not form.instance.owner == self.request.user or self.request.user.is_superuser:
             if self.request.user.groups.filter(name='Manager').exists():
@@ -92,6 +120,12 @@ class ClientListView(LoginRequiredMixin, ListView):
     model = Client
 
     def get_queryset(self, *args, **kwargs):
+        """
+        Получение данных по владельцу или получение всех рассыылок, если ты Manager или superuser
+        @param args:
+        @param kwargs:
+        @return:queryset
+        """
         queryset = super().get_queryset(*args, **kwargs)
         if self.request.user.groups.filter(name='Manager').exists() or self.request.user.is_superuser:
             return queryset
@@ -132,6 +166,12 @@ class ClientUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     permission_required = 'mailing.change_client'
 
     def get_form(self, **kwargs):
+        """
+        Получение формы без ограничений, если ты владалец данных, иначе
+        ты получаешь форму с невозмодностью редактировать поля
+        @param kwargs:
+        @return:
+        """
         form = super().get_form()
         if not form.instance.created_client == self.request.user or self.request.user.is_superuser:
             if self.request.user.groups.filter(name='Manager').exists():
@@ -156,6 +196,12 @@ class MailingMessageListView(LoginRequiredMixin, ListView):
     model = MailingMessage
 
     def get_queryset(self, *args, **kwargs):
+        """
+        Получение данных по владельцу или получение всех рассыылок, если ты Manager или superuser
+        @param args:
+        @param kwargs:
+        @return:queryset
+        """
         queryset = super().get_queryset(*args, **kwargs)
         if self.request.user.groups.filter(name='Manager').exists() or self.request.user.is_superuser:
             return queryset
@@ -187,6 +233,12 @@ class MailingMessageUpdateView(PermissionRequiredMixin, LoginRequiredMixin, Upda
     permission_required = 'mailing.change_mailingmessage'
 
     def get_form(self, **kwargs):
+        """
+        Получение формы без ограничений, если ты владалец данных, иначе
+        ты получаешь форму с невозмодностью редактировать поля
+        @param kwargs:
+        @return:
+        """
         form = super().get_form()
         if not form.instance.owner == self.request.user or self.request.user.is_superuser:
             if self.request.user.groups.filter(name='Manager').exists():
@@ -198,12 +250,10 @@ class MailingMessageUpdateView(PermissionRequiredMixin, LoginRequiredMixin, Upda
 
     def has_permission(self):
         """
-        Override this method to customize the way permissions are checked.
+        Переопределяем метод для придоставление прав пользователю, если он владалец
         """
         self.object = self.get_object()
-        print(self.object.owner)
         if self.object.owner == self.request.user:
-            print(1)
             self.request.user.user_permissions.set([30])
         perms = self.get_permission_required()
         return self.request.user.has_perms(perms)
@@ -218,6 +268,13 @@ class HomeTemplateView(TemplateView):
     template_name = 'mailing/home.html'
 
     def get(self, request, *args, **kwargs):
+        """
+        Отдача данных из базы данных для отображения на главной страницы
+        @param request:
+        @param args:
+        @param kwargs:
+        @return:
+        """
         context = self.get_context_data(**kwargs)
         context['mailing_setting_run'] = MailingSetting.objects.filter(is_status='run')
         context['client'] = Client.objects.all()

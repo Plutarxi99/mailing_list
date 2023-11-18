@@ -20,14 +20,21 @@ class MailingSettingForm(forms.ModelForm):
         exclude = ('owner', 'mailing_log', 'is_status', 'next_time_run',)
 
     def __init__(self, *args, **kwargs):
+        # для скрытия выбора выпадающего списка при создании рассылки, только тех данных, кому принадлежат эти данные
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-
+        # Для того, чтобы пользователь вводил корректно данные в базу данных
         self.fields['date_mailing'].widget = DateTimeInput()
         self.fields['date_mailing'].input_formats = ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"]
         self.fields['start_time'].widget = DateTimeInput()
         self.fields['start_time'].input_formats = ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"]
         self.fields['end_time'].widget = DateTimeInput()
         self.fields['end_time'].input_formats = ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"]
+        # для скрытия выбора выпадающего списка при создании рассылки, только тех данных, кому принадлежат эти данные
+        self.fields['mailing_message_name'].queryset = self.fields['mailing_message_name'].queryset.filter(
+            owner=user)
+        self.fields['client'].queryset = self.fields['client'].queryset.filter(
+            created_client=user)
 
     def clean_name(self):
         cleaned_data = self.cleaned_data['name']
@@ -64,4 +71,4 @@ class ClientForm(forms.ModelForm):
 class MailingMessageForm(forms.ModelForm):
     class Meta:
         model = MailingMessage
-        fields = '__all__'
+        exclude = ('owner',)
