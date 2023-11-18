@@ -1,17 +1,11 @@
-from urllib.parse import urlparse
-
-from django.contrib.auth.views import redirect_to_login
-from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.shortcuts import resolve_url, get_object_or_404, redirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 
 from journal.models import Journal
 from mailing.forms import MailingSettingForm, ClientForm, MailingMessageForm
 from mailing.models import Client, MailingSetting, MailingMessage
-from users.models import User
 
 
 class MailingSettingCreateView(LoginRequiredMixin, CreateView):
@@ -58,11 +52,21 @@ class MailingSettingListView(LoginRequiredMixin, ListView):
             return queryset.filter(owner=self.request.user)
 
 
-class MailingSettingUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+class MailingSettingUpdateView(UserPassesTestMixin, PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     model = MailingSetting
     form_class = MailingSettingForm
     success_url = reverse_lazy('mailing:mailing_list')
     permission_required = 'mailing.change_mailingsetting'
+
+    def get_form_kwargs(self):
+        """
+        Переопредяем метод для получения почты владельца ,то есть того кто авторизован
+        и сохраняем в переменную для получения в forms.py queryset, которые фильтруются по владельцу
+        @return: kwargs
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def get_object(self, queryset=None):
         """
@@ -96,15 +100,17 @@ class MailingSettingUpdateView(PermissionRequiredMixin, LoginRequiredMixin, Upda
                     form.errors.pop(field_name, None)
         return form
 
-    def has_permission(self):
+    def test_func(self):
         """
-        Override this method to customize the way permissions are checked.
+        Проверка если пользваотель владелец, суперпользователь или Manager
+        пропускает к редактированию
+        @return:
         """
         self.object = self.get_object()
-        if self.object.owner == self.request.user:
-            self.request.user.user_permissions.set([34])
-        perms = self.get_permission_required()
-        return self.request.user.has_perms(perms)
+        if self.request.user == self.object.owner or self.request.user.groups.filter(
+                name='Manager').exists() or self.request.user.is_superuser:
+            return True
+        return False
 
 
 class MailingSettingDeleteView(LoginRequiredMixin, DeleteView):
@@ -159,7 +165,7 @@ class ClientDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('mailing:list_client')
 
 
-class ClientUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+class ClientUpdateView(UserPassesTestMixin, PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     model = Client
     success_url = reverse_lazy('mailing:list_client')
     form_class = ClientForm
@@ -181,15 +187,17 @@ class ClientUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
                     form.errors.pop(field_name, None)
         return form
 
-    def has_permission(self):
+    def test_func(self):
         """
-        Override this method to customize the way permissions are checked.
+        Проверка если пользваотель владелец, суперпользователь или Manager
+        пропускает к редактированию
+        @return:
         """
         self.object = self.get_object()
-        if self.object.created_client == self.request.user:
-            self.request.user.user_permissions.set([38])
-        perms = self.get_permission_required()
-        return self.request.user.has_perms(perms)
+        if self.request.user == self.object.created_client or self.request.user.groups.filter(
+                name='Manager').exists() or self.request.user.is_superuser:
+            return True
+        return False
 
 
 class MailingMessageListView(LoginRequiredMixin, ListView):
@@ -226,7 +234,7 @@ class MailingMessageCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class MailingMessageUpdateView(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+class MailingMessageUpdateView(UserPassesTestMixin, PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     model = MailingMessage
     form_class = MailingMessageForm
     success_url = reverse_lazy('mailing:mailing_message_list')
@@ -248,15 +256,17 @@ class MailingMessageUpdateView(PermissionRequiredMixin, LoginRequiredMixin, Upda
                     form.errors.pop(field_name, None)
         return form
 
-    def has_permission(self):
+    def test_func(self):
         """
-        Переопределяем метод для придоставление прав пользователю, если он владалец
+        Проверка если пользваотель владелец, суперпользователь или Manager
+        пропускает к редактированию
+        @return:
         """
         self.object = self.get_object()
-        if self.object.owner == self.request.user:
-            self.request.user.user_permissions.set([30])
-        perms = self.get_permission_required()
-        return self.request.user.has_perms(perms)
+        if self.request.user == self.object.owner or self.request.user.groups.filter(
+                name='Manager').exists() or self.request.user.is_superuser:
+            return True
+        return False
 
 
 class MailingMessageDeleteView(LoginRequiredMixin, DeleteView):

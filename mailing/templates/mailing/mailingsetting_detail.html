@@ -11,10 +11,6 @@
 
                     <tr>
                         <th>Названия рассылка</th>
-                        <th>Время рассылки</th>
-                        <th>Время следующей рассылки</th>
-                        <th>Начало рассылки</th>
-                        <th>Конец рассылки</th>
                         <th>Переодичность рассылки</th>
                         <th>Статус рассылки</th>
                         <th>Названия темы сообщения рассылки</th>
@@ -25,18 +21,6 @@
                     <tr>
                         <td>
                             {{ object.name }}
-                        </td>
-                        <td>
-                            {{ object.date_mailing }}
-                        </td>
-                        <td>
-                            {{ object.next_time_run }}
-                        </td>
-                        <td>
-                            {{ object.start_time }}
-                        </td>
-                        <td>
-                            {{ object.end_time }}
                         </td>
                         <td>
                             {{ object.frequency }}
@@ -55,11 +39,38 @@
                         </td>
                     </tr>
                 </table>
+                                <table class="table table-striped">
+
+                    <tr>
+                        <th>Время рассылки</th>
+                        <th>Время следующей рассылки</th>
+                        <th>Начало рассылки</th>
+                        <th>Конец рассылки</th>
+                        <th>Последняя отправка</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{ object.date_mailing }}
+                        </td>
+                        <td>
+                            {{ object.next_time_run }}
+                        </td>
+                        <td>
+                            {{ object.start_time }}
+                        </td>
+                        <td>
+                            {{ object.end_time }}
+                        </td>
+                        <td>
+                            {{ object.mailing_log.last_try }}
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
 </div>
-        <div class="footer">
-            <button  value="Cancel" class="btn btn-secondary " onclick="window.history.back()" aria-current="page">Назад</button>
-        </div>
+<div class="footer">
+    <button value="Cancel" class="btn btn-secondary " onclick="window.history.back()" aria-current="page">Назад</button>
+</div>
 {% endblock %}

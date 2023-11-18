@@ -45,7 +45,7 @@ class Client(models.Model):
     comment = models.TextField(verbose_name='комментарий', **NULLABLE)
 
     created_client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-                              verbose_name='создатель клиента', **NULLABLE)
+                                       verbose_name='создатель клиента', **NULLABLE)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name} ({self.email})'
@@ -88,7 +88,6 @@ class MailingSetting(models.Model):
     mailing_log = models.ForeignKey(MailingLog, on_delete=models.SET_NULL, verbose_name='mailing_log', **NULLABLE)
 
     client = models.ManyToManyField(Client, verbose_name='относится к рассылке')
-
 
     def __init__(self, *args, **kwargs):
         super(MailingSetting, self).__init__(*args, **kwargs)

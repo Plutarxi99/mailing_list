@@ -7,6 +7,17 @@ from mailing.models import Client, MailingSetting, MailingMessage, MailingLog
 class MailingMessageAdmin(admin.ModelAdmin):
     list_display = ('topic', 'body',)
 
+    def get_readonly_fields(self, request, obj=None):
+        """
+        Для скрытия полей редактированиия в админ панели
+        @param request:
+        @param obj:
+        @return:
+        """
+        if request.user.is_staff:
+            return ['owner', 'body', 'topic']
+        return self.readonly_fields
+
 
 @admin.register(MailingLog)
 class MailingLogAdmin(admin.ModelAdmin):
@@ -17,6 +28,17 @@ class MailingLogAdmin(admin.ModelAdmin):
 class ClientAdmin(admin.ModelAdmin):
     list_display = ('email', 'first_name', 'last_name', 'comment',)
 
+    def get_readonly_fields(self, request, obj=None):
+        """
+        Для скрытия полей редактированиия в админ панели
+        @param request:
+        @param obj:
+        @return:
+        """
+        if request.user.is_staff:
+            return ['created_client', 'comment', 'last_name', 'first_name', 'email']
+        return self.readonly_fields
+
 
 @admin.register(MailingSetting)
 class MailingSettingAdmin(admin.ModelAdmin):
@@ -26,7 +48,13 @@ class MailingSettingAdmin(admin.ModelAdmin):
         'mailing_log',)
 
     def get_readonly_fields(self, request, obj=None):
-        print(request.user.groups.filter(name='Manager').exists())
-        if request.user.groups.filter(name='Manager').exists():
-            return ['name', 'date_mailing', 'next_time_run', 'start_time', 'end_time', 'frequency', 'is_status', 'owner', 'mailing_message_name', 'mailing_log', 'client', ]
+        """
+        Для скрытия полей редактированиия в админ панели
+        @param request:
+        @param obj:
+        @return:
+        """
+        if request.user.is_staff:
+            return ['name', 'date_mailing', 'next_time_run', 'start_time', 'end_time', 'frequency', 'is_status',
+                    'owner', 'mailing_message_name', 'mailing_log', 'client', ]
         return self.readonly_fields
