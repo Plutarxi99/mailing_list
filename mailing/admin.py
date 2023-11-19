@@ -14,7 +14,7 @@ class MailingMessageAdmin(admin.ModelAdmin):
         @param obj:
         @return:
         """
-        if request.user.is_staff:
+        if request.user.groups.filter(name='Manager').exists():
             return ['owner', 'body', 'topic']
         return self.readonly_fields
 
@@ -35,7 +35,7 @@ class ClientAdmin(admin.ModelAdmin):
         @param obj:
         @return:
         """
-        if request.user.is_staff:
+        if request.user.groups.filter(name='Manager').exists():
             return ['created_client', 'comment', 'last_name', 'first_name', 'email']
         return self.readonly_fields
 
@@ -46,6 +46,8 @@ class MailingSettingAdmin(admin.ModelAdmin):
         'name', 'date_mailing', 'next_time_run', 'start_time', 'end_time', 'frequency', 'is_status',
         'mailing_message_name',
         'mailing_log',)
+    raw_id_fields = ['client', ]
+
 
     def get_readonly_fields(self, request, obj=None):
         """
@@ -54,7 +56,7 @@ class MailingSettingAdmin(admin.ModelAdmin):
         @param obj:
         @return:
         """
-        if request.user.is_staff:
+        if request.user.groups.filter(name='Manager').exists():
             return ['name', 'date_mailing', 'next_time_run', 'start_time', 'end_time', 'frequency', 'is_status',
                     'owner', 'mailing_message_name', 'mailing_log', 'client', ]
         return self.readonly_fields
