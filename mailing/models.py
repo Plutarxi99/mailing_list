@@ -13,7 +13,7 @@ class MailingMessage(models.Model):
     body = models.TextField(verbose_name='тело письма')
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-                              verbose_name='создатель рассылки', **NULLABLE)
+                              verbose_name='создатель рассылки')
 
     def __str__(self):
         return f'{self.topic}'
@@ -26,9 +26,9 @@ class MailingMessage(models.Model):
 class MailingLog(models.Model):
     name = models.CharField(max_length=300, verbose_name='названия рассылки лога', **NULLABLE)
     last_try = models.DateTimeField(default=0, verbose_name='последняя попытка', **NULLABLE)
-    is_status_try = models.BooleanField(verbose_name='статус попытки', **NULLABLE)
+    is_status_try = models.BooleanField(default=False, verbose_name='статус попытки')
     response_server = models.TextField(verbose_name='ответ сервера', **NULLABLE)
-    count_send_mail = models.IntegerField(default=0, verbose_name="количество отправленных рассылок")
+    count_send_mail = models.PositiveIntegerField(default=0, verbose_name="количество отправленных рассылок")
 
     def __str__(self):
         return f' {self.last_try} {self.response_server}'
@@ -44,8 +44,8 @@ class Client(models.Model):
     last_name = models.CharField(max_length=150, verbose_name='фамилия', **NULLABLE)
     comment = models.TextField(verbose_name='комментарий', **NULLABLE)
 
-    created_client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-                                       verbose_name='создатель клиента', **NULLABLE)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                              verbose_name='создатель клиента')
 
     def __str__(self):
         return f'{self.first_name} {self.last_name} ({self.email})'
@@ -76,11 +76,11 @@ class MailingSetting(models.Model):
     next_time_run = models.DateTimeField(default=timezone.now, verbose_name='дата следующей рассылки')
     start_time = models.DateTimeField(default=timezone.now, verbose_name='начало рассылки')
     end_time = models.DateTimeField(default=timezone.now, verbose_name='конец рассылки')
-    frequency = models.CharField(choices=FREQUENCY, verbose_name='периодичность', **NULLABLE)
-    is_status = models.CharField(choices=STATUS, verbose_name='статус рассылки', **NULLABLE)
+    frequency = models.CharField(choices=FREQUENCY, verbose_name='периодичность')
+    is_status = models.CharField(choices=STATUS, verbose_name='статус рассылки')
     is_active_mailing = models.BooleanField(default=True, verbose_name='активность рассылки')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-                              verbose_name='создатель рассылки', **NULLABLE)
+                              verbose_name='создатель рассылки')
 
     mailing_message_name = models.ForeignKey(MailingMessage, on_delete=models.CASCADE,
                                              verbose_name='название рассылки сообщения')
@@ -89,14 +89,6 @@ class MailingSetting(models.Model):
 
     client = models.ManyToManyField(Client, verbose_name='относится к рассылке')
 
-    def __init__(self, *args, **kwargs):
-        super(MailingSetting, self).__init__(*args, **kwargs)
-        self._is_status = self.is_status
-        self._start_time = self.start_time
-        self._end_time = self.end_time
-        self._next_time_run = self.next_time_run
-        self._date_mailing = self.date_mailing
-        self._frequency = self.frequency
 
     def save(self, *args, **kwargs):
         """
@@ -110,17 +102,25 @@ class MailingSetting(models.Model):
             self.is_status = 'create'
         elif self.start_time.timestamp() < time_now < self.end_time.timestamp():
             self.is_status = 'run'
-            if self.frequency == 'day':
-                self.next_time_run = self.date_mailing + datetime.timedelta(days=1)
-            elif self.frequency == 'week':
-                self.next_time_run = self.date_mailing + datetime.timedelta(days=7)
-            elif self.frequency == 'month':
-                # Получение дней в месяце
-                days_in_month = calendar.monthrange(year=now().year, month=now().month)[1]
-                self.next_time_run = self.date_mailing + datetime.timedelta(days=days_in_month)
+            self.next_time_run = self._get_next_time_run()
         else:
             self.is_status = 'finish'
         super(MailingSetting, self).save(*args, **kwargs)
+
+    def _get_next_time_run(self) -> datetime:
+        if self.frequency == 'day':
+            next_time_run = self.date_mailing + datetime.timedelta(days=1)
+        elif self.frequency == 'week':
+            next_time_run = self.date_mailing + datetime.timedelta(days=7)
+        elif self.frequency == 'month':
+            # Получение дней в месяце
+            days_in_month = calendar.monthrange(
+                year=now().year, month=now().month
+            )[1]
+            delta = datetime.timedelta(days=days_in_month)
+            next_time_run = self.date_mailing + delta
+        else:
+            raise NotImplementedError
 
     def __str__(self):
         return f'{self.name} ({self.start_time} - {self.end_time})'

@@ -34,7 +34,7 @@ class MailingSettingForm(forms.ModelForm):
         self.fields['mailing_message_name'].queryset = self.fields['mailing_message_name'].queryset.filter(
             owner=user)
         self.fields['client'].queryset = self.fields['client'].queryset.filter(
-            created_client=user)
+            owner=user)
 
     def clean_name(self):
         cleaned_data = self.cleaned_data['name']

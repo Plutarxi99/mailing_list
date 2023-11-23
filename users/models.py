@@ -1,11 +1,11 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from config.settings import NULLABLE
 
 
 class User(AbstractUser):
-
     username = None
 
     email = models.EmailField(unique=True, verbose_name='Email')
@@ -25,6 +25,11 @@ class User(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
+    def has_one_of_groups(self, *groups: str) -> bool:
+        groups_filter = Q()
+        for group_name in groups:
+            groups_filter |= Q(name=group_name)
+        return self.groups.filter(groups_filter).exists()
 
     class Meta:
         verbose_name = 'пользователь'

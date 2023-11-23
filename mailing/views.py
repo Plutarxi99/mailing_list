@@ -1,5 +1,7 @@
+from django.db.models import Q
 from django.http import Http404
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 
@@ -20,7 +22,8 @@ class MailingSettingCreateView(LoginRequiredMixin, CreateView):
         @return: kwargs
         """
         kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
+        user = self.request.user
+        kwargs['user'] = user
         return kwargs
 
     def form_valid(self, form):
@@ -29,9 +32,7 @@ class MailingSettingCreateView(LoginRequiredMixin, CreateView):
         @param form:
         @return:
         """
-        self.object = form.save()
-        self.object.owner = self.request.user
-        self.object.save()
+        form.instance.owner = self.request.user
         return super().form_valid(form)
 
 
@@ -46,7 +47,8 @@ class MailingSettingListView(LoginRequiredMixin, ListView):
         @return:queryset
         """
         queryset = super().get_queryset(*args, **kwargs)
-        if self.request.user.groups.filter(name='Manager').exists() or self.request.user.is_superuser:
+        user = self.request.user
+        if user.has_one_of_groups('Manager') or user.is_superuser:
             return queryset
         else:
             return queryset.filter(owner=self.request.user)
@@ -76,9 +78,10 @@ class MailingSettingUpdateView(UserPassesTestMixin, PermissionRequiredMixin, Log
         @return:queryset
         """
         self.object = super().get_object(queryset)
-        if self.request.user.is_superuser or self.request.user.groups.filter(name='Manager').exists():
+        user = self.request.user
+        if user.has_one_of_groups('Manager') or user.is_superuser:
             return self.object
-        elif self.object.owner != self.request.user:
+        elif self.object.owner != user:
             raise Http404
         else:
             return self.object
@@ -91,8 +94,9 @@ class MailingSettingUpdateView(UserPassesTestMixin, PermissionRequiredMixin, Log
         @return:
         """
         form = super().get_form()
-        if not form.instance.owner == self.request.user or self.request.user.is_superuser:
-            if self.request.user.groups.filter(name='Manager').exists():
+        user = self.request.user
+        if not form.instance.owner == user or self.request.user.is_superuser:
+            if user.has_one_of_groups('Manager') or user.is_superuser:
                 enabled_fields = set()
                 enabled_fields.add('is_active_mailing')
                 for field_name in enabled_fields.symmetric_difference(form.fields):
@@ -107,8 +111,8 @@ class MailingSettingUpdateView(UserPassesTestMixin, PermissionRequiredMixin, Log
         @return:
         """
         self.object = self.get_object()
-        if self.request.user == self.object.owner or self.request.user.groups.filter(
-                name='Manager').exists() or self.request.user.is_superuser:
+        user = self.request.user
+        if user == self.object.owner or user.has_one_of_groups('Manager') or user.is_superuser:
             return True
         return False
 
@@ -133,10 +137,11 @@ class ClientListView(LoginRequiredMixin, ListView):
         @return:queryset
         """
         queryset = super().get_queryset(*args, **kwargs)
-        if self.request.user.groups.filter(name='Manager').exists() or self.request.user.is_superuser:
+        user = self.request.user
+        if user.has_one_of_groups('Manager') or user.is_superuser:
             return queryset
         else:
-            return queryset.filter(created_client=self.request.user)
+            return queryset.filter(owner=self.request.user)
 
 
 class ClientDetailView(LoginRequiredMixin, DetailView):
@@ -154,9 +159,7 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
         @param form:
         @return:
         """
-        self.object = form.save()
-        self.object.created_client = self.request.user
-        self.object.save()
+        form.instance.owner = self.request.user
         return super().form_valid(form)
 
 
@@ -179,8 +182,9 @@ class ClientUpdateView(UserPassesTestMixin, PermissionRequiredMixin, LoginRequir
         @return:
         """
         form = super().get_form()
-        if not form.instance.created_client == self.request.user or self.request.user.is_superuser:
-            if self.request.user.groups.filter(name='Manager').exists():
+        user = self.request.user
+        if not form.instance.owner == user or user.is_superuser:
+            if user.has_one_of_groups('Manager'):
                 enabled_fields = set()
                 for field_name in enabled_fields.symmetric_difference(form.fields):
                     form.fields[field_name].disabled = True
@@ -194,8 +198,8 @@ class ClientUpdateView(UserPassesTestMixin, PermissionRequiredMixin, LoginRequir
         @return:
         """
         self.object = self.get_object()
-        if self.request.user == self.object.created_client or self.request.user.groups.filter(
-                name='Manager').exists() or self.request.user.is_superuser:
+        user = self.request.user
+        if user == self.object.owner or user.has_one_of_groups('Manager') or user.is_superuser:
             return True
         return False
 
@@ -211,10 +215,11 @@ class MailingMessageListView(LoginRequiredMixin, ListView):
         @return:queryset
         """
         queryset = super().get_queryset(*args, **kwargs)
-        if self.request.user.groups.filter(name='Manager').exists() or self.request.user.is_superuser:
+        user = self.request.user
+        if user.has_one_of_groups('Manager') or user.is_superuser:
             return queryset
         else:
-            return queryset.filter(owner=self.request.user)
+            return queryset.filter(owner=user)
 
 
 class MailingMessageCreateView(LoginRequiredMixin, CreateView):
@@ -228,9 +233,7 @@ class MailingMessageCreateView(LoginRequiredMixin, CreateView):
         @param form:
         @return:
         """
-        self.object = form.save()
-        self.object.owner = self.request.user
-        self.object.save()
+        form.instance.owner = self.request.user
         return super().form_valid(form)
 
 
@@ -248,8 +251,9 @@ class MailingMessageUpdateView(UserPassesTestMixin, PermissionRequiredMixin, Log
         @return:
         """
         form = super().get_form()
-        if not form.instance.owner == self.request.user or self.request.user.is_superuser:
-            if self.request.user.groups.filter(name='Manager').exists():
+        user = self.request.user
+        if not form.instance.owner == user or user.is_superuser:
+            if user.has_one_of_groups('Manager'):
                 enabled_fields = set()
                 for field_name in enabled_fields.symmetric_difference(form.fields):
                     form.fields[field_name].disabled = True
@@ -263,8 +267,8 @@ class MailingMessageUpdateView(UserPassesTestMixin, PermissionRequiredMixin, Log
         @return:
         """
         self.object = self.get_object()
-        if self.request.user == self.object.owner or self.request.user.groups.filter(
-                name='Manager').exists() or self.request.user.is_superuser:
+        user = self.request.user
+        if user == self.object.owner or user.has_one_of_groups('Manager') or user.is_superuser:
             return True
         return False
 
